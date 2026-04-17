@@ -6,6 +6,8 @@
     <title>ArcPay | USDC Payment Gateway</title>
     <!-- ethers.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --bg: #fafafa;
@@ -22,6 +24,7 @@
             --disclaimer-border: #ffedd5;
             --disclaimer-text: #9a3412;
             --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --gold: #f59e0b;
         }
 
         * {
@@ -113,19 +116,24 @@
 
         main {
             flex: 1;
-            padding: 3rem 1.5rem;
+            padding: 2rem 1.5rem;
             max-width: 1100px;
             width: 100%;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
         }
 
-        @media (min-width: 768px) {
-            main {
-                grid-template-columns: 1.1fr 0.9fr;
-                padding: 4rem 2.5rem;
+        .view-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .view-container {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -137,7 +145,8 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            height: fit-content;
         }
 
         h2 {
@@ -430,10 +439,49 @@
             transition: all 0.2s ease;
         }
 
-        .tab.active {
+        .qr-container {
             background: white;
-            color: var(--text-main);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem auto;
+            width: 160px;
+            height: 160px;
+        }
+
+        .balance-badge {
+            background: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-funds-info {
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .add-funds-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #166534;
+        }
+
+        .add-funds-info p {
+            font-size: 0.8rem;
+            color: #166534;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -455,77 +503,115 @@
     </header>
 
     <main>
-        <!-- Mobile Switcher -->
-        <div class="mobile-view-tabs" id="viewSwitcher">
-            <div class="tab active" onclick="switchView('request')">Request</div>
-            <div class="tab" onclick="switchView('payment')">Payment</div>
+        <!-- Tab Navigation -->
+        <div class="mobile-view-tabs" id="navSwitcher">
+            <div class="tab active" onclick="switchView('send')">Send</div>
+            <div class="tab" onclick="switchView('request')">Request</div>
+            <div class="tab" onclick="switchView('checkout')">Checkout</div>
+            <div class="tab" onclick="switchView('wallet')">Wallet</div>
         </div>
 
-        <!-- Create Request Card -->
-        <section class="card" id="requestView">
-            <h2><span class="step-number">1</span>Payment Intent</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Configure your USDC request parameters below.</p>
-            
-            <div class="form-group">
-                <label for="reqAddress">Recipient Account</label>
-                <input type="text" id="reqAddress" placeholder="Connect wallet to sync" readonly>
-            </div>
-            
-            <div class="form-group" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
-                <div>
-                    <label for="reqAmount">USDC Amount</label>
-                    <input type="number" id="reqAmount" placeholder="0.00" step="0.01" min="0">
+        <div class="view-container">
+            <!-- Send / Direct Pay -->
+            <section class="card" id="sendView">
+                <h2><span class="step-number">1</span>Send Payment</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address.</p>
+                
+                <div class="form-group">
+                    <label for="directAddress">Recipient Address</label>
+                    <input type="text" id="directAddress" placeholder="0x...">
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="reqDesc">Memo / Description</label>
-                <input type="text" id="reqDesc" placeholder="e.g. Creative Consultancy">
-            </div>
-
-            <button id="generateLinkBtn" class="btn btn-primary">Create Payment Link</button>
-
-            <div id="linkOutputContainer" class="hidden">
-                <div class="link-box" id="paymentLink"></div>
-                <button id="copyLinkBtn" class="btn btn-outline" style="margin-top: 1rem;">Copy Link</button>
-            </div>
-        </section>
-
-        <!-- Payment Card -->
-        <section class="card" id="paymentView">
-            <h2><span class="step-number">2</span>Checkout Flow</h2>
-            
-            <div id="paymentPrompt" style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.95rem; padding: 2rem; border: 2px dashed var(--border); border-radius: 16px; text-align: center;">
-                Awaiting payment intent. Use a request link to view settlement details.
-            </div>
-
-            <div id="paymentDetails" class="hidden">
-                <div class="payment-summary">
-                    <div class="summary-item">
-                        <span class="summary-label">Reference</span>
-                        <span class="summary-value" id="payDescDisp">-</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Settlement Account</span>
-                        <span class="summary-value" id="payToDisp">0x...</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Total Due</span>
-                        <span class="summary-value large" id="payAmountDisp">0.00 USDC</span>
-                    </div>
+                
+                <div class="form-group">
+                    <label for="directAmount">USDC Amount</label>
+                    <input type="number" id="directAmount" placeholder="0.00" step="0.01">
                 </div>
 
-                <div style="margin-bottom: 1.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
-                    Payment processed via <strong>Universal USDC Standard</strong>
+                <div class="form-group">
+                    <label for="directDesc">Reason (Optional)</label>
+                    <input type="text" id="directDesc" placeholder="e.g. For dinner">
                 </div>
 
-                <button id="executePaymentBtn" class="btn btn-primary" style="background: #111;" disabled>
-                    Authorize Payment
-                </button>
-            </div>
+                <button id="directPayBtn" class="btn btn-primary">Pay Directly</button>
+            </section>
 
-            <div id="txStatus"></div>
-        </section>
+            <!-- Request / Link Gen -->
+            <section class="card hidden" id="requestView">
+                <h2><span class="step-number">2</span>Payment Intent</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Generate a link to receive USDC.</p>
+                
+                <div class="form-group">
+                    <label for="reqAddress">Your Account</label>
+                    <input type="text" id="reqAddress" placeholder="Connect wallet to sync" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reqAmount">Requested Amount</label>
+                    <input type="number" id="reqAmount" placeholder="0.00" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="reqDesc">Memo / Description</label>
+                    <input type="text" id="reqDesc" placeholder="e.g. Logo Design">
+                </div>
+
+                <button id="generateLinkBtn" class="btn btn-outline">Create Payment Link</button>
+
+                <div id="linkOutputContainer" class="hidden">
+                    <div class="link-box" id="paymentLink"></div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="copyLinkBtn" class="btn btn-primary" style="margin-top: 1rem; flex: 2;">Copy Link</button>
+                        <button id="openLinkBtn" class="btn btn-outline" style="margin-top: 1rem; flex: 1;">Open</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Checkout / View Link -->
+            <section class="card hidden" id="paymentView">
+                <h2><span class="step-number">3</span>Checkout Flow</h2>
+                
+                <div id="paymentPrompt" style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.95rem; padding: 2rem; border: 2px dashed var(--border); border-radius: 16px; text-align: center;">
+                    Awaiting payment intent. Use a request link to view details.
+                </div>
+
+                <div id="paymentDetails" class="hidden">
+                    <div class="payment-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Reference</span>
+                            <span class="summary-value" id="payDescDisp">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Recipient</span>
+                            <span class="summary-value" id="payToDisp">0x...</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Amount</span>
+                            <span class="summary-value large" id="payAmountDisp">0.00 USDC</span>
+                        </div>
+                    </div>
+                    <button id="executePaymentBtn" class="btn btn-primary">Authorize Payment</button>
+                </div>
+                <div id="txStatus"></div>
+            </section>
+
+            <!-- Wallet / QR & Funds -->
+            <section class="card hidden" id="walletView">
+                <h2><span class="step-number">4</span>Wallet Profile</h2>
+                
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div class="balance-badge" id="balanceDisplay">Balance: 0.00 USDC</div>
+                </div>
+
+                <label style="text-align: center;">Your Receive QR Code</label>
+                <div id="qrcode" class="qr-container"></div>
+                <div id="qrAddressDisp" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: -1rem; word-break: break-all;">No wallet connected</div>
+
+                <div class="add-funds-info">
+                    <h4>How to Add Funds?</h4>
+                    <p>To use this app, you need USDC and ETH (for gas). On Sepolia Testnet, you can obtain free tokens from the <a href="https://faucet.circle.com/" target="_blank" style="color: inherit; font-weight: 700;">Circle Faucet</a>.</p>
+                </div>
+            </section>
+        </div>
     </main>
 
     <section class="disclaimer-section">
@@ -555,7 +641,8 @@
         const USDC_ABI = [
             "function transfer(address to, uint256 amount) public returns (bool)",
             "function decimals() public view returns (uint8)",
-            "function symbol() public view returns (string)"
+            "function symbol() public view returns (string)",
+            "function balanceOf(address owner) view returns (uint256)"
         ];
 
         // Default or placeholder
@@ -565,8 +652,9 @@
          * APP STATE
          */
         let provider, signer, account;
-        let currentView = 'request';
+        let currentView = 'send';
         let paymentData = null;
+        let qrCode = null;
 
         /**
          * DOM ELEMENTS
@@ -575,8 +663,10 @@
             connectBtn: document.getElementById('connectWalletBtn'),
             walletBtnText: document.getElementById('walletBtnText'),
             statusIndicator: document.getElementById('statusIndicator'),
+            sendView: document.getElementById('sendView'),
             requestView: document.getElementById('requestView'),
             paymentView: document.getElementById('paymentView'),
+            walletView: document.getElementById('walletView'),
             reqAmount: document.getElementById('reqAmount'),
             reqDesc: document.getElementById('reqDesc'),
             reqAddress: document.getElementById('reqAddress'),
@@ -584,14 +674,22 @@
             linkContainer: document.getElementById('linkOutputContainer'),
             paymentLink: document.getElementById('paymentLink'),
             copyBtn: document.getElementById('copyLinkBtn'),
+            openLinkBtn: document.getElementById('openLinkBtn'),
             payAmountDisp: document.getElementById('payAmountDisp'),
             payDescDisp: document.getElementById('payDescDisp'),
             payToDisp: document.getElementById('payToDisp'),
             executeBtn: document.getElementById('executePaymentBtn'),
             txStatus: document.getElementById('txStatus'),
-            viewSwitcher: document.getElementById('viewSwitcher'),
+            navSwitcher: document.getElementById('navSwitcher'),
             paymentPrompt: document.getElementById('paymentPrompt'),
-            paymentDetails: document.getElementById('paymentDetails')
+            paymentDetails: document.getElementById('paymentDetails'),
+            directAddress: document.getElementById('directAddress'),
+            directAmount: document.getElementById('directAmount'),
+            directDesc: document.getElementById('directDesc'),
+            directPayBtn: document.getElementById('directPayBtn'),
+            balanceDisplay: document.getElementById('balanceDisplay'),
+            qrcode: document.getElementById('qrcode'),
+            qrAddressDisp: document.getElementById('qrAddressDisp')
         };
 
         /**
@@ -623,11 +721,17 @@
                 elements.walletBtnText.textContent = shortAddr;
                 elements.reqAddress.value = account;
                 elements.statusIndicator.classList.add('connected');
+                elements.qrAddressDisp.textContent = account;
                 
-                // Enable payment if on payment view
-                if (paymentData) {
-                    elements.executeBtn.disabled = false;
-                }
+                // Generate QR Code
+                generateQRCode(account);
+                
+                // Fetch Balance
+                updateBalance();
+
+                // Enable payment buttons
+                if (paymentData) elements.executeBtn.disabled = false;
+                elements.directPayBtn.disabled = false;
 
                 // Handle network changes
                 window.ethereum.on('accountsChanged', (accounts) => location.reload());
@@ -637,6 +741,32 @@
                 console.error(err);
                 elements.walletBtnText.textContent = "Connect Wallet";
                 alert("Failed to connect wallet: " + err.message);
+            }
+        }
+
+        function generateQRCode(address) {
+            elements.qrcode.innerHTML = "";
+            qrCode = new QRCode(elements.qrcode, {
+                text: address,
+                width: 140,
+                height: 140,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        async function updateBalance() {
+            if (!account || !provider) return;
+            try {
+                const network = await provider.getNetwork();
+                const usdcAddress = USDC_CONTRACTS[Number(network.chainId)] || DEFAULT_USDC;
+                const contract = new ethers.Contract(usdcAddress, USDC_ABI, provider);
+                const balance = await contract.balanceOf(account);
+                const decodedBalance = ethers.formatUnits(balance, 6);
+                elements.balanceDisplay.textContent = `Balance: ${parseFloat(decodedBalance).toFixed(2)} USDC`;
+            } catch (err) {
+                console.warn("Failed to fetch balance:", err);
             }
         }
 
@@ -650,31 +780,29 @@
             
             // Update tabs
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const tabs = document.querySelectorAll('.tab');
+            const tabs = Array.from(document.querySelectorAll('.tab'));
+            const viewToIndex = { 'send': 0, 'request': 1, 'checkout': 2, 'wallet': 3 };
             if (tabs.length > 0) {
-                const index = view === 'request' ? 0 : 1;
-                tabs[index].classList.add('active');
+                tabs[viewToIndex[view]].classList.add('active');
             }
 
-            // Toggle containers (only relevant for mobile mobile-view-tabs)
-            // On desktop both will be visible if we let the grid flow, 
-            // but the switcher is mainly for small screens.
-            if (window.innerWidth < 768) {
-                if (view === 'request') {
-                    elements.requestView.classList.remove('hidden');
-                    elements.paymentView.classList.add('hidden');
-                } else {
-                    elements.requestView.classList.add('hidden');
-                    elements.paymentView.classList.remove('hidden');
-                }
-            } else {
-                // On desktop, ensure both are visible if that's the desired aesthetic
-                elements.requestView.classList.remove('hidden');
-                elements.paymentView.classList.remove('hidden');
+            // Toggle containers
+            const views = [elements.sendView, elements.requestView, elements.paymentView, elements.walletView];
+            views.forEach(v => v.classList.add('hidden'));
+
+            if (view === 'send') elements.sendView.classList.remove('hidden');
+            if (view === 'request') elements.requestView.classList.remove('hidden');
+            if (view === 'checkout') elements.paymentView.classList.remove('hidden');
+            if (view === 'wallet') elements.walletView.classList.remove('hidden');
+
+            // Handle Desktop Grid overrides (if any specific columns needed)
+            if (window.innerWidth >= 1024) {
+               // On desktop we might want to show two at a time? 
+               // For now, let's keep one view active but cleaner.
             }
         }
 
-        // Add resize listener to handle view visibility switching
+        // Add resize listener
         window.addEventListener('resize', () => {
             switchView(currentView);
         });
@@ -696,13 +824,7 @@
                 return;
             }
 
-            const data = {
-                a: amount,
-                d: desc,
-                r: recipient
-            };
-
-            // Encode data to Base64
+            const data = { a: amount, d: desc, r: recipient };
             const encoded = btoa(JSON.stringify(data));
             const baseUrl = window.location.origin + window.location.pathname;
             const fullLink = `${baseUrl}#p=${encoded}`;
@@ -720,6 +842,12 @@
             });
         });
 
+        elements.openLinkBtn.addEventListener('click', () => {
+             const link = elements.paymentLink.textContent;
+             window.location.hash = link.split('#')[1];
+             checkUrlForPayment();
+        });
+
         /**
          * PAYMENT EXECUTION
          */
@@ -729,68 +857,77 @@
                 try {
                     const encoded = hash.substring(3);
                     const decoded = JSON.parse(atob(encoded));
-                    
                     paymentData = decoded;
                     
-                    // Populate Payment View
                     elements.payAmountDisp.textContent = `${paymentData.a} USDC`;
-                    elements.payDescDisp.textContent = paymentData.d || 'No description';
+                    elements.payDescDisp.textContent = paymentData.d || 'Generic Payment';
                     elements.payToDisp.textContent = paymentData.r;
 
-                    // Show details, hide prompt
                     elements.paymentPrompt.classList.add('hidden');
                     elements.paymentDetails.classList.remove('hidden');
 
-                    // Switch to Payment View on mobile
-                    switchView('payment');
+                    switchView('checkout');
                 } catch (err) {
                     console.error("Invalid payment link", err);
                 }
             } else {
-                // Default view
-                switchView('request');
+                switchView('send');
             }
         }
 
+        // Direct Pay Handler
+        elements.directPayBtn.addEventListener('click', async () => {
+            const to = elements.directAddress.value;
+            const amount = elements.directAmount.value;
+            const desc = elements.directDesc.value;
+
+            if (!to || !amount || amount <= 0) {
+                alert("Please enter a valid address and amount.");
+                return;
+            }
+
+            // Temporarily set paymentData for unified transfer logic
+            paymentData = { a: amount, r: to, d: desc };
+            await performTransfer();
+        });
+
         elements.executeBtn.addEventListener('click', async () => {
-            if (!paymentData || !signer) return;
+            await performTransfer();
+        });
+
+        async function performTransfer() {
+            if (!paymentData || !signer) {
+                alert("Please connect wallet and provide payment data.");
+                return;
+            }
 
             try {
-                showStatus("Preparing transaction...", "loading");
-                elements.executeBtn.disabled = true;
-
+                switchView('checkout'); // Ensure we are on the status view
+                showStatus("Initiating secure transfer...", "loading");
+                
                 const network = await provider.getNetwork();
-                const chainId = Number(network.chainId);
-                const usdcAddress = USDC_CONTRACTS[chainId] || DEFAULT_USDC;
-
+                const usdcAddress = USDC_CONTRACTS[Number(network.chainId)] || DEFAULT_USDC;
                 const contract = new ethers.Contract(usdcAddress, USDC_ABI, signer);
                 
-                // USDC has 6 decimals
                 const amountUnits = ethers.parseUnits(paymentData.a.toString(), 6);
-
                 const tx = await contract.transfer(paymentData.r, amountUnits);
                 
-                showStatus("Transaction submitted. Waiting for confirmation...", "loading");
-                
+                showStatus("Waiting for blockchain confirmation...", "loading");
                 const receipt = await tx.wait();
                 
-                showStatus(`Success! Payment sent.<br><a href="https://etherscan.io/tx/${receipt.hash}" target="_blank" style="color: inherit; text-decoration: underline;">View on Explorer</a>`, "success");
-
+                showStatus(`Success! Transfer complete.<br><a href="https://etherscan.io/tx/${receipt.hash}" target="_blank" class="tx-hash">View Transaction</a>`, "success");
+                updateBalance();
             } catch (err) {
                 console.error(err);
                 let msg = err.message;
-                if (err.code === "ACTION_REJECTED") msg = "User rejected the transaction.";
-                if (err.data && err.data.message) msg = err.data.message;
-                
-                showStatus("Payment Failed: " + msg, "error");
-                elements.executeBtn.disabled = false;
+                if (err.code === "ACTION_REJECTED") msg = "Transaction rejected by user.";
+                showStatus("Transfer Failed: " + msg, "error");
             }
-        });
+        }
 
         function showStatus(text, type) {
             elements.txStatus.innerHTML = text;
-            elements.txStatus.className = ""; // clear all
-            
+            elements.txStatus.className = ""; 
             if (type === 'loading') {
                 elements.txStatus.classList.add('status-loading');
                 elements.txStatus.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><div class="spinner"></div> ${text}</div>`;
