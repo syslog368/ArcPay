@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root {
+            /* Light Theme (Default) */
             --bg: #fafafa;
             --card-bg: #ffffff;
             --text-main: #1a1a1a;
@@ -27,6 +28,24 @@
             --disclaimer-text: #9a3412;
             --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
             --gold: #f59e0b;
+            --modal-overlay: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --text-main: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --primary: #ffffff;
+            --primary-hover: #e5e5e5;
+            --success: #34d399;
+            --error: #f87171;
+            --border: #262626;
+            --accent: #1a1a1a;
+            --disclaimer-bg: #1a1510;
+            --disclaimer-border: #2d241a;
+            --disclaimer-text: #fb923c;
+            --modal-overlay: rgba(0, 0, 0, 0.8);
         }
 
         * {
@@ -77,11 +96,17 @@
             height: 100%;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(8px);
+            transition: background 0.5s ease;
+        }
+
+        [data-theme="dark"] .video-bg-overlay {
+            background: rgba(0, 0, 0, 0.75);
         }
 
         header {
             padding: 1.25rem 2.5rem;
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--card-bg);
+            opacity: 0.95;
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -90,6 +115,31 @@
             position: sticky;
             top: 0;
             z-index: 100;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--accent);
+            color: var(--text-main);
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            background: var(--border);
         }
 
         .logo {
@@ -175,7 +225,7 @@
 
         .sidebar-item {
             padding: 1rem 1.25rem;
-            background: white;
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
             text-decoration: none;
@@ -254,90 +304,111 @@
         }
 
         .form-group {
-            margin-bottom: 1.75rem;
+            margin-bottom: 2rem;
+            position: relative;
         }
 
         label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 0.6rem;
-            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.1em;
+            transition: color 0.2s ease;
+        }
+
+        .form-group:focus-within label {
+            color: var(--primary);
         }
 
         input {
             width: 100%;
-            padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            padding: 1.15rem 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: 16px;
             font-size: 1rem;
             color: var(--text-main);
-            background: var(--bg);
-            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         input:focus {
             outline: none;
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input::placeholder {
+            color: #a3a3a3;
+            font-size: 0.95rem;
         }
 
         input[readonly] {
             background: var(--accent);
             cursor: not-allowed;
             opacity: 0.7;
+            border-style: dashed;
         }
 
         .btn {
-            padding: 1rem 2rem;
-            border-radius: 12px;
+            padding: 1.15rem 2rem;
+            border-radius: 16px;
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
             text-align: center;
             border: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
         }
 
         .btn-primary:hover {
             background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.25);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.3);
         }
 
         .btn-primary:disabled {
-            background: #d4d4d4;
+            background: #e5e5e5;
+            color: #a3a3a3;
             box-shadow: none;
             cursor: not-allowed;
+            transform: none;
         }
 
         .btn-outline {
-            background: transparent;
+            background: white;
             border: 2px solid var(--border);
             color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
         .btn-outline:hover {
             background: var(--accent);
-            border-color: var(--text-main);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
         }
 
         .payment-summary {
@@ -470,7 +541,7 @@
             color: var(--text-muted);
             display: flex;
             justify-content: space-between;
-            background: white;
+            background: var(--card-bg);
             font-weight: 500;
         }
 
@@ -613,6 +684,94 @@
         }
 
         .history-link:hover { text-decoration: underline; }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 28px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #d1fae5;
+            color: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        [data-theme="dark"] .success-icon {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .modal-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .modal-summary {
+            background: var(--accent);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .modal-row:last-child { margin-bottom: 0; }
+
+        .modal-row span:first-child { color: var(--text-muted); }
+        .modal-row span:last-child { font-weight: 700; color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -633,9 +792,15 @@
             </div>
             ArcPay
         </a>
-        <div class="wallet-status" id="connectWalletBtn">
-            <div class="status-indicator" id="statusIndicator"></div>
-            <span id="walletBtnText">Connect Wallet</span>
+        <div class="header-actions">
+            <div id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">
+                <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg id="themeIconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <div class="wallet-status" id="connectWalletBtn">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="walletBtnText">Connect Wallet</span>
+            </div>
         </div>
     </header>
 
@@ -682,7 +847,10 @@
                         <input type="text" id="directDesc" placeholder="e.g. For dinner">
                     </div>
 
-                    <button id="directPayBtn" class="btn btn-primary">Pay Directly</button>
+                    <button id="directPayBtn" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Pay Directly
+                    </button>
                     <div id="directTxStatus"></div>
                 </section>
 
@@ -706,7 +874,10 @@
                         <input type="text" id="reqDesc" placeholder="e.g. Logo Design">
                     </div>
 
-                    <button id="generateLinkBtn" class="btn btn-outline">Create Payment Link</button>
+                    <button id="generateLinkBtn" class="btn btn-outline">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        Create Payment Link
+                    </button>
 
                     <div id="linkOutputContainer" class="hidden">
                         <div class="link-box" id="paymentLink"></div>
@@ -740,7 +911,10 @@
                                 <span class="summary-value large" id="payAmountDisp">0.00 USDC</span>
                             </div>
                         </div>
-                        <button id="executePaymentBtn" class="btn btn-primary">Authorize Payment</button>
+                        <button id="executePaymentBtn" class="btn btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Authorize Payment
+                        </button>
                     </div>
                     <div id="txStatus"></div>
                 </section>
@@ -789,6 +963,35 @@
         </p>
     </section>
 
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="success-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 class="modal-title">Payment Confirmed</h3>
+            <p class="modal-subtitle">Your USDC has been broadcast to the network.</p>
+            
+            <div class="modal-summary">
+                <div class="modal-row">
+                    <span>Recipient</span>
+                    <span id="modalRecipient">0x...</span>
+                </div>
+                <div class="modal-row">
+                    <span>Amount</span>
+                    <span id="modalAmount">0.00 USDC</span>
+                </div>
+                <div class="modal-row">
+                    <span>Reference</span>
+                    <span id="modalRef">-</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <a id="modalExplorerBtn" href="#" target="_blank" class="btn btn-primary">View on ArcScan</a>
+                <button id="modalCloseBtn" class="btn btn-outline">Back to Dashboard</button>
+            </div>
+        </div>
+    </div>
     <footer>
         <span>ArcPay Protocol &copy; 2026</span>
         <span>Secured by Blockchain Verification</span>
@@ -865,7 +1068,16 @@
             qrcode: document.getElementById('qrcode'),
             qrAddressDisp: document.getElementById('qrAddressDisp'),
             historyList: document.getElementById('historyList'),
-            directTxStatus: document.getElementById('directTxStatus')
+            directTxStatus: document.getElementById('directTxStatus'),
+            themeToggle: document.getElementById('themeToggle'),
+            themeIconSun: document.getElementById('themeIconSun'),
+            themeIconMoon: document.getElementById('themeIconMoon'),
+            confirmModal: document.getElementById('confirmModal'),
+            modalRecipient: document.getElementById('modalRecipient'),
+            modalAmount: document.getElementById('modalAmount'),
+            modalRef: document.getElementById('modalRef'),
+            modalExplorerBtn: document.getElementById('modalExplorerBtn'),
+            modalCloseBtn: document.getElementById('modalCloseBtn'),
         };
 
         let transactions = JSON.parse(localStorage.getItem('arcpay_transactions') || '[]');
@@ -873,7 +1085,30 @@
         /**
          * INITIALIZATION
          */
+        function initTheme() {
+            const savedTheme = localStorage.getItem('arcpay_theme') || 'light';
+            setTheme(savedTheme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('arcpay_theme', theme);
+            if (theme === 'dark') {
+                elements.themeIconSun.style.display = 'block';
+                elements.themeIconMoon.style.display = 'none';
+            } else {
+                elements.themeIconSun.style.display = 'none';
+                elements.themeIconMoon.style.display = 'block';
+            }
+        }
+
+        elements.themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
         window.addEventListener('load', async () => {
+            initTheme();
             initVideoBackground();
             checkUrlForPayment();
         });
@@ -1165,6 +1400,13 @@
                 const txLink = `https://testnet.arcscan.app/tx/${receipt.hash}`;
                 showStatus(`Success! Transfer complete.<br><a href="${txLink}" target="_blank" class="tx-hash">View Transaction</a>`, "success", statusEl);
                 
+                // Show Confirmation Modal
+                elements.modalRecipient.textContent = paymentData.r.substring(0, 10) + '...' + paymentData.r.substring(38);
+                elements.modalAmount.textContent = `${paymentData.a} USDC`;
+                elements.modalRef.textContent = paymentData.d || 'Direct Payment';
+                elements.modalExplorerBtn.href = txLink;
+                elements.confirmModal.classList.add('active');
+
                 // Add to history
                 addTransaction({
                     type: 'sent',
@@ -1191,6 +1433,11 @@
                 showStatus("Transfer Failed: " + msg, "error", statusEl);
             }
         }
+
+        elements.modalCloseBtn.addEventListener('click', () => {
+            elements.confirmModal.classList.remove('active');
+            switchView('wallet');
+        });
 
         function addTransaction(tx) {
             transactions.unshift(tx);
