@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- HLS.js for streaming video background -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root {
             --bg: #fafafa;
@@ -35,12 +37,46 @@
         }
 
         body {
-            background-color: var(--bg);
+            background-color: transparent;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             line-height: 1.5;
+        }
+
+        /* Video Background */
+        .video-bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .video-bg-container video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .video-bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
         }
 
         header {
@@ -581,6 +617,13 @@
 </head>
 <body>
 
+    <div class="video-bg-container">
+        <video id="bgVideo" autoplay muted loop playsinline poster="https://picsum.photos/seed/arcpay/1920/1080?blur=10">
+            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_094440_a3592600-bd1e-49e5-9bce-a73662061d83.mp4" type="video/mp4">
+        </video>
+        <div class="video-bg-overlay"></div>
+    </div>
+
     <header>
         <a href="/" class="logo">
             <div class="logo-icon">
@@ -755,11 +798,18 @@
         /**
          * CONFIGURATION
          */
+        const ARC_TESTNET_CONFIG = {
+            chainId: '0x8235', // 33333 in hex
+            chainName: 'ARC Testnet',
+            nativeCurrency: { name: 'ARC', symbol: 'ARC', decimals: 18 },
+            rpcUrls: ['https://rpc-testnet.arcscan.app'],
+            blockExplorerUrls: ['https://testnet.arcscan.app/']
+        };
+
         const USDC_CONTRACTS = {
+            33333: "0x1c7D4B196Cb0232b3144efd80f94D600221276a2", // ARC Testnet (Placeholder - update with real ARC USDC)
             1: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // Mainnet
             11155111: "0x1c7D4B196Cb0232b3144efd80f94D600221276a2", // Sepolia
-            8453: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base
-            // Add more testnets as needed
         };
 
         const USDC_ABI = [
@@ -824,8 +874,29 @@
          * INITIALIZATION
          */
         window.addEventListener('load', async () => {
+            initVideoBackground();
             checkUrlForPayment();
         });
+
+        function initVideoBackground() {
+            const video = document.getElementById('bgVideo');
+            const hlsUrl = 'https://stream.mux.com/BuGGTsiXq1T00WUb8qfURrHkTCbhrkfFLSv4uAOZzdhw.m3u8';
+            
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(hlsUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // For Safari
+                video.src = hlsUrl;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
+        }
 
         async function connectWallet() {
             if (typeof window.ethereum === 'undefined') {
@@ -843,6 +914,9 @@
                 const accounts = await provider.send("eth_requestAccounts", []);
                 account = accounts[0];
                 signer = await provider.getSigner();
+
+                // Automate ARC Network Switch
+                await ensureArcNetwork();
 
                 // Update UI
                 const shortAddr = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
@@ -1024,6 +1098,45 @@
             await performTransfer();
         });
 
+        async function ensureArcNetwork() {
+            if (!window.ethereum) return;
+            try {
+                // Check if user is on ARC Testnet
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                if (chainId !== ARC_TESTNET_CONFIG.chainId) {
+                    showStatus("Switching to ARC Network...", "loading");
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: ARC_TESTNET_CONFIG.chainId }],
+                        });
+                    } catch (switchError) {
+                        // This error code indicates that the chain has not been added to MetaMask.
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [ARC_TESTNET_CONFIG],
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                    // Refresh provider/signer after switch
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    showStatus("Switched to ARC Network", "success");
+                    setTimeout(() => { 
+                        if (elements.txStatus.classList.contains('status-success')) {
+                            elements.txStatus.style.display = 'none';
+                        }
+                    }, 3000);
+                }
+            } catch (err) {
+                console.error("Network switch failed", err);
+                alert("Please switch to the ARC Network in MetaMask for this app to function correctly.");
+            }
+        }
+
         async function performTransfer() {
             if (!paymentData || !signer) {
                 alert("Please connect wallet and provide payment data.");
@@ -1034,6 +1147,8 @@
             const statusEl = isDirect ? elements.directTxStatus : elements.txStatus;
 
             try {
+                await ensureArcNetwork();
+
                 if (!isDirect) switchView('checkout');
                 showStatus("Initiating secure transfer...", "loading", statusEl);
                 
@@ -1066,11 +1181,11 @@
 
                 // Handle specific RPC/Provider errors
                 if (msg.includes("Unauthorized") || msg.includes("API key")) {
-                    msg = "<strong>RPC Authentication Error:</strong> Your wallet's network provider (Ankr) requires an API key. Please switch your MetaMask network RPC to a public one or use the official Sepolia network.";
+                    msg = "<strong>ARC Network Configuration Issue:</strong> Your MetaMask is using a restricted RPC. Please allow the app to add the correct ARC Network settings automatically.";
                 } else if (err.code === "ACTION_REJECTED") {
                     msg = "Transaction rejected by user.";
                 } else if (msg.includes("could not coalesce error")) {
-                    msg = "Blockchain node error. This usually means your wallet is connected to a network RPC that is restricted or down. Try switching RPCs in MetaMask settings.";
+                    msg = "Blockchain node error. We are attempting to reconnect. Please try again or check your ARC Network settings.";
                 }
                 
                 showStatus("Transfer Failed: " + msg, "error", statusEl);
