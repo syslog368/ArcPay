@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcPay | USDC Payment Gateway</title>
+    <!-- ethers.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1rem 2rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            border-radius: 99px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .wallet-status:hover {
+            border-color: var(--border);
+            background: #e2e8f0;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .status-indicator.connected {
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            main {
+                grid-template-columns: 1.125fr 0.875fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--text-main);
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        input[readonly] {
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .payment-summary {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            font-size: 0.875rem;
+            word-break: break-all;
+            text-align: right;
+            margin-left: 1rem;
+        }
+
+        .summary-value.large {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .link-box {
+            background: #f1f5f9;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            word-break: break-all;
+            margin-top: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        #txStatus {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .status-success {
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            color: #065f46;
+            display: block !important;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: #991b1b;
+            display: block !important;
+        }
+
+        .status-loading {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #1e40af;
+            display: block !important;
+        }
+
+        .tx-hash {
+            font-family: monospace;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            display: block;
+            opacity: 0.8;
+        }
+
+        footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            background: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: currentColor;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* View Switcher only for mobile if needed, but grid works well on desktop */
+        .mobile-view-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            margin-bottom: 2rem;
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .mobile-view-tabs {
+                display: none;
+            }
+        }
+
+        .tab {
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--text-main);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">
+            <div class="logo-icon"></div>
+            ArcPay
+        </a>
+        <div class="wallet-status" id="connectWalletBtn">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="walletBtnText">Connect Wallet</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Mobile Switcher -->
+        <div class="mobile-view-tabs" id="viewSwitcher">
+            <div class="tab active" onclick="switchView('request')">Request</div>
+            <div class="tab" onclick="switchView('payment')">Payment</div>
+        </div>
+
+        <!-- Create Request Card -->
+        <section class="card" id="requestView">
+            <h2><span class="step-number">1</span>Create Request</h2>
+            
+            <div class="form-group">
+                <label for="reqAddress">Recipient Address</label>
+                <input type="text" id="reqAddress" placeholder="Connect wallet to set" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="reqAmount">Amount (USDC)</label>
+                <input type="number" id="reqAmount" placeholder="0.00" step="0.01" min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="reqDesc">Description</label>
+                <input type="text" id="reqDesc" placeholder="e.g. Logo Design">
+            </div>
+
+            <button id="generateLinkBtn" class="btn btn-primary">Generate Payment Link</button>
+
+            <div id="linkOutputContainer" class="hidden">
+                <div class="link-box" id="paymentLink"></div>
+                <button id="copyLinkBtn" class="btn btn-outline" style="margin-top: 0.75rem;">Copy Link</button>
+            </div>
+        </section>
+
+        <!-- Payment Card -->
+        <section class="card" id="paymentView">
+            <h2><span class="step-number">2</span>Payment Checkout</h2>
+            
+            <div id="paymentPrompt" style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.875rem;">
+                Receive a payment link to see detailed checkout info here.
+            </div>
+
+            <div id="paymentDetails" class="hidden">
+                <div class="payment-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Description</span>
+                        <span class="summary-value" id="payDescDisp">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Recipient</span>
+                        <span class="summary-value" id="payToDisp">0x...</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Total Amount</span>
+                        <span class="summary-value large" id="payAmountDisp">0.00 USDC</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem; text-align: center; font-size: 0.75rem; color: var(--text-muted);">
+                    Target Network: <strong>EVM (USDC Enabled)</strong>
+                </div>
+
+                <button id="executePaymentBtn" class="btn btn-primary" style="background: #0f172a;" disabled>
+                    Pay Now
+                </button>
+            </div>
+
+            <div id="txStatus"></div>
+        </section>
+    </main>
+
+    <footer>
+        <span>&copy; 2026 ArcPay Protocol v1.0.4</span>
+        <span>Powered by Ethers.js</span>
+    </footer>
+
+    <script>
+        /**
+         * CONFIGURATION
+         */
+        const USDC_CONTRACTS = {
+            1: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // Mainnet
+            11155111: "0x1c7D4B196Cb0232b3144efd80f94D600221276a2", // Sepolia
+            8453: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base
+            // Add more testnets as needed
+        };
+
+        const USDC_ABI = [
+            "function transfer(address to, uint256 amount) public returns (bool)",
+            "function decimals() public view returns (uint8)",
+            "function symbol() public view returns (string)"
+        ];
+
+        // Default or placeholder
+        const DEFAULT_USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; 
+
+        /**
+         * APP STATE
+         */
+        let provider, signer, account;
+        let currentView = 'request';
+        let paymentData = null;
+
+        /**
+         * DOM ELEMENTS
+         */
+        const elements = {
+            connectBtn: document.getElementById('connectWalletBtn'),
+            walletBtnText: document.getElementById('walletBtnText'),
+            statusIndicator: document.getElementById('statusIndicator'),
+            requestView: document.getElementById('requestView'),
+            paymentView: document.getElementById('paymentView'),
+            reqAmount: document.getElementById('reqAmount'),
+            reqDesc: document.getElementById('reqDesc'),
+            reqAddress: document.getElementById('reqAddress'),
+            generateBtn: document.getElementById('generateLinkBtn'),
+            linkContainer: document.getElementById('linkOutputContainer'),
+            paymentLink: document.getElementById('paymentLink'),
+            copyBtn: document.getElementById('copyLinkBtn'),
+            payAmountDisp: document.getElementById('payAmountDisp'),
+            payDescDisp: document.getElementById('payDescDisp'),
+            payToDisp: document.getElementById('payToDisp'),
+            executeBtn: document.getElementById('executePaymentBtn'),
+            txStatus: document.getElementById('txStatus'),
+            viewSwitcher: document.getElementById('viewSwitcher'),
+            paymentPrompt: document.getElementById('paymentPrompt'),
+            paymentDetails: document.getElementById('paymentDetails')
+        };
+
+        /**
+         * INITIALIZATION
+         */
+        window.addEventListener('load', async () => {
+            checkUrlForPayment();
+        });
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('Please install MetaMask to use this app.');
+                return;
+            }
+
+            try {
+                elements.walletBtnText.textContent = "Connecting...";
+                
+                // Initialize ethers provider
+                provider = new ethers.BrowserProvider(window.ethereum);
+                
+                // Request account access
+                const accounts = await provider.send("eth_requestAccounts", []);
+                account = accounts[0];
+                signer = await provider.getSigner();
+
+                // Update UI
+                const shortAddr = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
+                elements.walletBtnText.textContent = shortAddr;
+                elements.reqAddress.value = account;
+                elements.statusIndicator.classList.add('connected');
+                
+                // Enable payment if on payment view
+                if (paymentData) {
+                    elements.executeBtn.disabled = false;
+                }
+
+                // Handle network changes
+                window.ethereum.on('accountsChanged', (accounts) => location.reload());
+                window.ethereum.on('chainChanged', () => location.reload());
+
+            } catch (err) {
+                console.error(err);
+                elements.walletBtnText.textContent = "Connect Wallet";
+                alert("Failed to connect wallet: " + err.message);
+            }
+        }
+
+        elements.connectBtn.addEventListener('click', connectWallet);
+
+        /**
+         * VIEW MANAGEMENT
+         */
+        function switchView(view) {
+            currentView = view;
+            
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const tabs = document.querySelectorAll('.tab');
+            if (tabs.length > 0) {
+                const index = view === 'request' ? 0 : 1;
+                tabs[index].classList.add('active');
+            }
+
+            // Toggle containers (only relevant for mobile mobile-view-tabs)
+            // On desktop both will be visible if we let the grid flow, 
+            // but the switcher is mainly for small screens.
+            if (window.innerWidth < 768) {
+                if (view === 'request') {
+                    elements.requestView.classList.remove('hidden');
+                    elements.paymentView.classList.add('hidden');
+                } else {
+                    elements.requestView.classList.add('hidden');
+                    elements.paymentView.classList.remove('hidden');
+                }
+            } else {
+                // On desktop, ensure both are visible if that's the desired aesthetic
+                elements.requestView.classList.remove('hidden');
+                elements.paymentView.classList.remove('hidden');
+            }
+        }
+
+        // Add resize listener to handle view visibility switching
+        window.addEventListener('resize', () => {
+            switchView(currentView);
+        });
+
+        /**
+         * PAYMENT REQUEST GENERATION
+         */
+        elements.generateBtn.addEventListener('click', () => {
+            const amount = elements.reqAmount.value;
+            const desc = elements.reqDesc.value;
+            const recipient = account;
+
+            if (!recipient) {
+                alert("Please connect your wallet first.");
+                return;
+            }
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            const data = {
+                a: amount,
+                d: desc,
+                r: recipient
+            };
+
+            // Encode data to Base64
+            const encoded = btoa(JSON.stringify(data));
+            const baseUrl = window.location.origin + window.location.pathname;
+            const fullLink = `${baseUrl}#p=${encoded}`;
+
+            elements.paymentLink.textContent = fullLink;
+            elements.linkContainer.classList.remove('hidden');
+        });
+
+        elements.copyBtn.addEventListener('click', () => {
+            const link = elements.paymentLink.textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                const originalText = elements.copyBtn.textContent;
+                elements.copyBtn.textContent = "Copied!";
+                setTimeout(() => elements.copyBtn.textContent = originalText, 2000);
+            });
+        });
+
+        /**
+         * PAYMENT EXECUTION
+         */
+        function checkUrlForPayment() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#p=')) {
+                try {
+                    const encoded = hash.substring(3);
+                    const decoded = JSON.parse(atob(encoded));
+                    
+                    paymentData = decoded;
+                    
+                    // Populate Payment View
+                    elements.payAmountDisp.textContent = `${paymentData.a} USDC`;
+                    elements.payDescDisp.textContent = paymentData.d || 'No description';
+                    elements.payToDisp.textContent = paymentData.r;
+
+                    // Show details, hide prompt
+                    elements.paymentPrompt.classList.add('hidden');
+                    elements.paymentDetails.classList.remove('hidden');
+
+                    // Switch to Payment View on mobile
+                    switchView('payment');
+                } catch (err) {
+                    console.error("Invalid payment link", err);
+                }
+            } else {
+                // Default view
+                switchView('request');
+            }
+        }
+
+        elements.executeBtn.addEventListener('click', async () => {
+            if (!paymentData || !signer) return;
+
+            try {
+                showStatus("Preparing transaction...", "loading");
+                elements.executeBtn.disabled = true;
+
+                const network = await provider.getNetwork();
+                const chainId = Number(network.chainId);
+                const usdcAddress = USDC_CONTRACTS[chainId] || DEFAULT_USDC;
+
+                const contract = new ethers.Contract(usdcAddress, USDC_ABI, signer);
+                
+                // USDC has 6 decimals
+                const amountUnits = ethers.parseUnits(paymentData.a.toString(), 6);
+
+                const tx = await contract.transfer(paymentData.r, amountUnits);
+                
+                showStatus("Transaction submitted. Waiting for confirmation...", "loading");
+                
+                const receipt = await tx.wait();
+                
+                showStatus(`Success! Payment sent.<br><a href="https://etherscan.io/tx/${receipt.hash}" target="_blank" style="color: inherit; text-decoration: underline;">View on Explorer</a>`, "success");
+
+            } catch (err) {
+                console.error(err);
+                let msg = err.message;
+                if (err.code === "ACTION_REJECTED") msg = "User rejected the transaction.";
+                if (err.data && err.data.message) msg = err.data.message;
+                
+                showStatus("Payment Failed: " + msg, "error");
+                elements.executeBtn.disabled = false;
+            }
+        });
+
+        function showStatus(text, type) {
+            elements.txStatus.innerHTML = text;
+            elements.txStatus.className = ""; // clear all
+            
+            if (type === 'loading') {
+                elements.txStatus.classList.add('status-loading');
+                elements.txStatus.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;"><div class="spinner"></div> ${text}</div>`;
+            } else if (type === 'success') {
+                elements.txStatus.classList.add('status-success');
+            } else if (type === 'error') {
+                elements.txStatus.classList.add('status-error');
+            }
+        }
+    </script>
+</body>
+</html>
+
