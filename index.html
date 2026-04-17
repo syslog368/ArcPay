@@ -200,6 +200,11 @@
             box-shadow: 0 0 10px var(--success);
         }
 
+        .status-indicator.wrong-network {
+            background: var(--error);
+            box-shadow: 0 0 10px var(--error);
+        }
+
         main {
             flex: 1;
             padding: 1.5rem;
@@ -604,15 +609,22 @@
         }
 
         .balance-badge {
-            background: var(--accent);
-            padding: 0.5rem 1rem;
-            border-radius: 99px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--primary);
             display: inline-flex;
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 99px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .balance-badge.refreshing {
+            opacity: 0.7;
+            transform: scale(0.98);
         }
 
         .add-funds-info {
@@ -992,6 +1004,21 @@
             </div>
         </div>
     </div>
+    <div id="networkModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="success-icon" style="background: #fee2e2; color: #dc2626;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <h3 class="modal-title">Switch Network</h3>
+            <p class="modal-subtitle">ArcPay requires the ARC Testnet to function safely. Please switch your wallet to proceed.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button id="switchNetworkBtn" class="btn btn-primary">Switch to ARC Network</button>
+                <button id="networkModalCloseBtn" class="btn btn-outline">I'll do it later</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <span>ArcPay Protocol &copy; 2026</span>
         <span>Secured by Blockchain Verification</span>
@@ -1078,6 +1105,9 @@
             modalRef: document.getElementById('modalRef'),
             modalExplorerBtn: document.getElementById('modalExplorerBtn'),
             modalCloseBtn: document.getElementById('modalCloseBtn'),
+            networkModal: document.getElementById('networkModal'),
+            switchNetworkBtn: document.getElementById('switchNetworkBtn'),
+            networkModalCloseBtn: document.getElementById('networkModalCloseBtn'),
         };
 
         let transactions = JSON.parse(localStorage.getItem('arcpay_transactions') || '[]');
@@ -1107,10 +1137,35 @@
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
 
+        // Provider Event Listeners
+        if (window.ethereum) {
+            window.ethereum.on('chainChanged', (chainId) => {
+                console.log("Chain changed:", chainId);
+                window.location.reload();
+            });
+
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    window.location.reload();
+                } else {
+                    account = accounts[0];
+                    connectWallet();
+                }
+            });
+        }
+
         window.addEventListener('load', async () => {
             initTheme();
             initVideoBackground();
             checkUrlForPayment();
+            
+            // Start automatic balance refresh every 60 seconds
+            setInterval(() => {
+                if (account) {
+                    console.log("Auto-refreshing USDC balance...");
+                    updateBalance();
+                }
+            }, 60000);
         });
 
         function initVideoBackground() {
@@ -1196,6 +1251,8 @@
 
         async function updateBalance() {
             if (!account || !provider) return;
+            
+            elements.balanceDisplay.classList.add('refreshing');
             try {
                 const network = await provider.getNetwork();
                 const usdcAddress = USDC_CONTRACTS[Number(network.chainId)] || DEFAULT_USDC;
@@ -1205,6 +1262,10 @@
                 elements.balanceDisplay.textContent = `Balance: ${parseFloat(decodedBalance).toFixed(2)} USDC`;
             } catch (err) {
                 console.warn("Failed to fetch balance:", err);
+            } finally {
+                setTimeout(() => {
+                    elements.balanceDisplay.classList.remove('refreshing');
+                }, 500);
             }
         }
 
@@ -1231,7 +1292,10 @@
             if (view === 'send') elements.sendView.classList.remove('hidden');
             if (view === 'request') elements.requestView.classList.remove('hidden');
             if (view === 'checkout') elements.paymentView.classList.remove('hidden');
-            if (view === 'wallet') elements.walletView.classList.remove('hidden');
+            if (view === 'wallet') {
+                elements.walletView.classList.remove('hidden');
+                updateBalance(); // Refresh when user explicitly visits the wallet profile
+            }
 
             // Handle Desktop Grid overrides (if any specific columns needed)
             if (window.innerWidth >= 1024) {
@@ -1334,43 +1398,50 @@
         });
 
         async function ensureArcNetwork() {
-            if (!window.ethereum) return;
+            if (!window.ethereum) return false;
             try {
-                // Check if user is on ARC Testnet
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
                 if (chainId !== ARC_TESTNET_CONFIG.chainId) {
-                    showStatus("Switching to ARC Network...", "loading");
+                    elements.statusIndicator.className = 'status-indicator wrong-network';
+                    showStatus("Wrong Network! Please switch to ARC Testnet.", "loading");
+                    
                     try {
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: ARC_TESTNET_CONFIG.chainId }],
                         });
+                        return true;
                     } catch (switchError) {
-                        // This error code indicates that the chain has not been added to MetaMask.
                         if (switchError.code === 4902) {
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [ARC_TESTNET_CONFIG],
                             });
+                            return true;
                         } else {
-                            throw switchError;
+                            // User rejected or other error
+                            elements.networkModal.classList.add('active');
+                            return false;
                         }
                     }
-                    // Refresh provider/signer after switch
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    signer = await provider.getSigner();
-                    showStatus("Switched to ARC Network", "success");
-                    setTimeout(() => { 
-                        if (elements.txStatus.classList.contains('status-success')) {
-                            elements.txStatus.style.display = 'none';
-                        }
-                    }, 3000);
+                } else {
+                    elements.statusIndicator.className = 'status-indicator connected';
+                    return true;
                 }
             } catch (err) {
-                console.error("Network switch failed", err);
-                alert("Please switch to the ARC Network in MetaMask for this app to function correctly.");
+                console.error("Network check failed", err);
+                return false;
             }
         }
+
+        elements.switchNetworkBtn.addEventListener('click', async () => {
+            elements.networkModal.classList.remove('active');
+            await ensureArcNetwork();
+        });
+
+        elements.networkModalCloseBtn.addEventListener('click', () => {
+            elements.networkModal.classList.remove('active');
+        });
 
         async function performTransfer() {
             if (!paymentData || !signer) {
@@ -1378,12 +1449,13 @@
                 return;
             }
 
+            const success = await ensureArcNetwork();
+            if (!success) return;
+
             const isDirect = currentView === 'send';
             const statusEl = isDirect ? elements.directTxStatus : elements.txStatus;
 
             try {
-                await ensureArcNetwork();
-
                 if (!isDirect) switchView('checkout');
                 showStatus("Initiating secure transfer...", "loading", statusEl);
                 
@@ -1436,6 +1508,7 @@
 
         elements.modalCloseBtn.addEventListener('click', () => {
             elements.confirmModal.classList.remove('active');
+            updateBalance(); // Refresh immediately after payment modal closes
             switchView('wallet');
         });
 
