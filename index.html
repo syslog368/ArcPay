@@ -46,6 +46,152 @@
             --disclaimer-border: #2d241a;
             --disclaimer-text: #fb923c;
             --modal-overlay: rgba(0, 0, 0, 0.8);
+            --primary-rgb: 255, 255, 255;
+            --card-bg-rgb: 20, 20, 20;
+        }
+
+        /* Price Ticker */
+        .price-ticker {
+            background: #0a0a0a;
+            color: white;
+            padding: 0.6rem 2.5rem;
+            display: flex;
+            gap: 2.5rem;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            z-index: 95;
+            position: sticky;
+            top: 86px;
+            scrollbar-width: none;
+        }
+        .price-ticker::-webkit-scrollbar { display: none; }
+        .ticker-item { display: inline-flex; align-items: center; gap: 0.6rem; opacity: 0.9; transition: opacity 0.2s; }
+        .ticker-item:hover { opacity: 1; }
+        .ticker-price { font-weight: 800; color: var(--success); }
+        .ticker-change { font-size: 0.7rem; color: var(--success); }
+
+        /* Live Feed Sidebar */
+        .live-feed-container {
+            display: none;
+        }
+
+        @media (min-width: 1440px) {
+            .live-feed-container {
+                display: block;
+                position: sticky;
+                top: 140px;
+                height: calc(100vh - 160px);
+                width: 300px;
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                padding: 1.5rem;
+                overflow-y: auto;
+                scrollbar-width: none;
+            }
+        }
+
+        .feed-header {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .feed-item {
+            padding: 1rem;
+            background: var(--accent);
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        
+        .feed-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--success);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .feed-item-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        
+        .feed-item-addr { font-family: monospace; font-size: 0.7rem; color: var(--text-muted); }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Swap Module Styles */
+        .swap-card {
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .swap-input-box {
+            background: var(--accent);
+            padding: 1.25rem;
+            border-radius: 20px;
+            margin-bottom: 0.5rem;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .swap-input-box:focus-within {
+            border-color: var(--primary);
+        }
+        .swap-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.75rem; display: block; }
+        .swap-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .swap-val { font-size: 1.75rem; font-weight: 800; background: transparent; border: none; outline: none; color: var(--text-main); width: 65%; font-family: 'JetBrains Mono', monospace; }
+        .token-pill { background: var(--card-bg); padding: 0.6rem 1rem; border-radius: 14px; border: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; font-weight: 700; cursor: pointer; transition: all 0.2s; min-width: 100px; }
+        .token-pill:hover { background: var(--border); }
+        .token-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; flex-shrink: 0; }
+        .swap-divider { height: 2px; position: relative; margin: 1rem 0; display: flex; justify-content: center; }
+        .swap-arrow-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; border: 4px solid var(--card-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .percent-btns { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .pct-btn { flex: 1; padding: 0.5rem; border-radius: 10px; background: var(--accent); border: 1px solid var(--border); font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .pct-btn:hover { background: var(--primary); color: white; }
+
+        @media (min-width: 1024px) {
+            main {
+                grid-template-columns: 240px 1fr 300px;
+            }
         }
 
         * {
@@ -816,9 +962,35 @@
         </div>
     </header>
 
+    <div class="price-ticker">
+        <div class="ticker-item">
+            <span class="ticker-label">USDC/EURC</span>
+            <span class="ticker-price">$1.0630</span>
+            <span class="ticker-change">↑ 0.04%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-label">SWPRC</span>
+            <span class="ticker-price">$0.7100</span>
+            <span class="ticker-change">↑ 1.25%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-label">ARC</span>
+            <span class="ticker-price">$2.4500</span>
+            <span class="ticker-change">↓ 0.12%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-label">NETWORK LOAD</span>
+            <span class="ticker-price">LOW</span>
+        </div>
+    </div>
+
     <main>
         <!-- Sidebar Menu -->
         <aside class="sidebar">
+            <div class="sidebar-item" id="settingsBtn" onclick="switchView('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Settings
+            </div>
             <a href="https://testnet.arcscan.app/" target="_blank" class="sidebar-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 ArcScan Explorer
@@ -836,6 +1008,8 @@
                 <div class="tab" onclick="switchView('request')">Request</div>
                 <div class="tab" onclick="switchView('checkout')">Checkout</div>
                 <div class="tab" onclick="switchView('wallet')">Wallet</div>
+                <div class="tab" onclick="switchView('settings')">Settings</div>
+                <div class="tab" onclick="switchView('swap')">Swap</div>
             </div>
 
             <div class="view-container">
@@ -963,8 +1137,105 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Settings View -->
+                <section class="card hidden" id="settingsView">
+                    <h2>Settings</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Manage your application preferences and security.</p>
+
+                    <div style="display: flex; flex-direction: column; gap: 2rem;">
+                        <div class="form-group">
+                            <label>Default Network</label>
+                            <select class="btn btn-outline" style="width: 100%; text-align: left; padding-left: 1rem;" disabled>
+                                <option>ARC Testnet (Mandatory)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Appearance</label>
+                            <button id="settingsThemeToggle" class="btn btn-outline" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                                <span>Switch Theme</span>
+                                <span id="themeName">Light Mode</span>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notifications</label>
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--accent); padding: 1rem; border-radius: 12px;">
+                                <span style="font-size: 0.9rem; font-weight: 600;">Browser Alerts</span>
+                                <input type="checkbox" id="notifPush" checked>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Swap View -->
+                <section class="card hidden" id="swapView">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="margin-bottom: 0;">Swap</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <div class="theme-toggle" style="width: 36px; height: 36px; background: var(--accent);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div class="theme-toggle" style="width: 36px; height: 36px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;">1.0%</div>
+                        </div>
+                    </div>
+
+                    <div class="swap-input-box">
+                        <span class="swap-label">Sell</span>
+                        <div class="swap-row">
+                            <input type="number" class="swap-val" placeholder="0.00" value="0.00">
+                            <div class="token-pill">
+                                <div class="token-icon" style="background: #2775ca;">$</div>
+                                <span>USDC</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="percent-btns">
+                        <button class="pct-btn">25%</button>
+                        <button class="pct-btn">50%</button>
+                        <button class="pct-btn">75%</button>
+                        <button class="pct-btn">Max</button>
+                    </div>
+
+                    <div class="swap-divider">
+                        <div class="swap-arrow-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="swap-input-box">
+                        <span class="swap-label">Buy</span>
+                        <div class="swap-row">
+                            <input type="number" class="swap-val" placeholder="0.00" value="0.00" readonly>
+                            <div class="token-pill">
+                                <div class="token-icon" style="background: #003399;">€</div>
+                                <span>EURC</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 1.5rem;">Swap</button>
+                </section>
             </div>
         </div>
+
+        <!-- Live Feed Sidebar (Desktop) -->
+        <aside class="live-feed-container">
+            <div class="feed-header">
+                <span>Live Activity</span>
+                <span class="pulse"></span>
+            </div>
+            <div id="liveTransactionFeed">
+                <!-- Live items populated by JS -->
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem;">
+                    Listening for incoming payments...
+                </div>
+            </div>
+        </aside>
     </main>
 
     <section class="disclaimer-section">
@@ -974,6 +1245,36 @@
             Please do not use this for real-world value settlements.
         </p>
     </section>
+
+    <div id="reviewModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="success-icon" style="background: var(--accent); color: var(--primary);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <h3 class="modal-title">Review Transaction</h3>
+            <p class="modal-subtitle">Verify details and estimated fees before broadcasting.</p>
+            
+            <div class="modal-summary">
+                <div class="modal-row">
+                    <span>Recipient</span>
+                    <span id="reviewRecipient">0x...</span>
+                </div>
+                <div class="modal-row">
+                    <span>Amount</span>
+                    <span id="reviewAmount">0.00 USDC</span>
+                </div>
+                <div class="modal-row">
+                    <span>Estimated Fee</span>
+                    <span id="reviewFee" style="color: var(--primary);">0.0001 ARC</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button id="confirmPayBtn" class="btn btn-primary">Confirm & Send</button>
+                <button id="cancelPayBtn" class="btn btn-outline">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-card">
@@ -1108,6 +1409,17 @@
             networkModal: document.getElementById('networkModal'),
             switchNetworkBtn: document.getElementById('switchNetworkBtn'),
             networkModalCloseBtn: document.getElementById('networkModalCloseBtn'),
+            settingsView: document.getElementById('settingsView'),
+            settingsThemeToggle: document.getElementById('settingsThemeToggle'),
+            themeName: document.getElementById('themeName'),
+            reviewModal: document.getElementById('reviewModal'),
+            reviewRecipient: document.getElementById('reviewRecipient'),
+            reviewAmount: document.getElementById('reviewAmount'),
+            reviewFee: document.getElementById('reviewFee'),
+            confirmPayBtn: document.getElementById('confirmPayBtn'),
+            cancelPayBtn: document.getElementById('cancelPayBtn'),
+            swapView: document.getElementById('swapView'),
+            liveFeed: document.getElementById('liveTransactionFeed'),
         };
 
         let transactions = JSON.parse(localStorage.getItem('arcpay_transactions') || '[]');
@@ -1123,16 +1435,18 @@
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('arcpay_theme', theme);
-            if (theme === 'dark') {
-                elements.themeIconSun.style.display = 'block';
-                elements.themeIconMoon.style.display = 'none';
-            } else {
-                elements.themeIconSun.style.display = 'none';
-                elements.themeIconMoon.style.display = 'block';
-            }
+            const isDark = theme === 'dark';
+            elements.themeIconSun.style.display = isDark ? 'block' : 'none';
+            elements.themeIconMoon.style.display = isDark ? 'none' : 'block';
+            elements.themeName.textContent = isDark ? 'Dark Mode' : 'Light Mode';
         }
 
         elements.themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        elements.settingsThemeToggle.addEventListener('click', () => {
             const current = document.documentElement.getAttribute('data-theme');
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
@@ -1280,18 +1594,20 @@
             // Update tabs
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             const tabs = Array.from(document.querySelectorAll('.tab'));
-            const viewToIndex = { 'send': 0, 'request': 1, 'checkout': 2, 'wallet': 3 };
-            if (tabs.length > 0) {
+            const viewToIndex = { 'send': 0, 'request': 1, 'checkout': 2, 'wallet': 3, 'settings': 4, 'swap': 5 };
+            if (tabs.length > 0 && viewToIndex[view] !== undefined) {
                 tabs[viewToIndex[view]].classList.add('active');
             }
 
             // Toggle containers
-            const views = [elements.sendView, elements.requestView, elements.paymentView, elements.walletView];
+            const views = [elements.sendView, elements.requestView, elements.paymentView, elements.walletView, elements.settingsView, elements.swapView];
             views.forEach(v => v.classList.add('hidden'));
 
             if (view === 'send') elements.sendView.classList.remove('hidden');
             if (view === 'request') elements.requestView.classList.remove('hidden');
             if (view === 'checkout') elements.paymentView.classList.remove('hidden');
+            if (view === 'settings') elements.settingsView.classList.remove('hidden');
+            if (view === 'swap') elements.swapView.classList.remove('hidden');
             if (view === 'wallet') {
                 elements.walletView.classList.remove('hidden');
                 updateBalance(); // Refresh when user explicitly visits the wallet profile
@@ -1301,6 +1617,36 @@
             if (window.innerWidth >= 1024) {
                // On desktop we might want to show two at a time? 
                // For now, let's keep one view active but cleaner.
+            }
+        }
+
+        // Swipe Gesture Handling
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const SWIPE_THRESHOLD = 50;
+
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        window.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const views = ['send', 'request', 'checkout', 'wallet', 'settings', 'swap'];
+            const currentIndex = views.indexOf(currentView);
+            
+            if (touchEndX < touchStartX - SWIPE_THRESHOLD) {
+                // Swipe Left (Next View)
+                const nextIndex = (currentIndex + 1) % views.length;
+                switchView(views[nextIndex]);
+            }
+            if (touchEndX > touchStartX + SWIPE_THRESHOLD) {
+                // Swipe Right (Prev View)
+                const prevIndex = (currentIndex - 1 + views.length) % views.length;
+                switchView(views[prevIndex]);
             }
         }
 
@@ -1457,16 +1803,50 @@
 
             try {
                 if (!isDirect) switchView('checkout');
-                showStatus("Initiating secure transfer...", "loading", statusEl);
-                
+                showStatus("Calculating estimated fees...", "loading", statusEl);
+
                 const network = await provider.getNetwork();
                 const usdcAddress = USDC_CONTRACTS[Number(network.chainId)] || DEFAULT_USDC;
                 const contract = new ethers.Contract(usdcAddress, USDC_ABI, signer);
                 
                 const amountUnits = ethers.parseUnits(paymentData.a.toString(), 6);
-                const tx = await contract.transfer(paymentData.r, amountUnits);
-                
+
+                // Estimate Gas
+                const gasEstimate = await contract.transfer.estimateGas(paymentData.r, amountUnits);
+                const feeData = await provider.getFeeData();
+                const estimatedFee = gasEstimate * (feeData.gasPrice || 20000000000n); // fallback to 20 gwei if not available
+                const feeInArc = ethers.formatEther(estimatedFee);
+
+                // Show Review Modal
+                elements.reviewRecipient.textContent = paymentData.r.substring(0, 10) + '...' + paymentData.r.substring(38);
+                elements.reviewAmount.textContent = `${paymentData.a} USDC`;
+                elements.reviewFee.textContent = `${parseFloat(feeInArc).toFixed(6)} ARC`;
+                elements.reviewModal.classList.add('active');
+
+                // Confirmation Promise
+                const confirmPromise = new Promise((resolve) => {
+                    const confirmHandler = () => {
+                        elements.confirmPayBtn.removeEventListener('click', confirmHandler);
+                        elements.reviewModal.classList.remove('active');
+                        resolve(true);
+                    };
+                    const cancelHandler = () => {
+                        elements.cancelPayBtn.removeEventListener('click', cancelHandler);
+                        elements.reviewModal.classList.remove('active');
+                        resolve(false);
+                    };
+                    elements.confirmPayBtn.addEventListener('click', confirmHandler);
+                    elements.cancelPayBtn.addEventListener('click', cancelHandler);
+                });
+
+                const userConfirmed = await confirmPromise;
+                if (!userConfirmed) {
+                    showStatus("Transfer cancelled by user.", "info", statusEl);
+                    return;
+                }
+
                 showStatus("Waiting for blockchain confirmation...", "loading", statusEl);
+                const tx = await contract.transfer(paymentData.r, amountUnits);
                 const receipt = await tx.wait();
                 
                 const txLink = `https://testnet.arcscan.app/tx/${receipt.hash}`;
@@ -1489,6 +1869,7 @@
                 });
 
                 updateBalance();
+                addLiveBroadcast(paymentData.a, paymentData.r);
             } catch (err) {
                 console.error(err);
                 let msg = err.message;
@@ -1519,6 +1900,93 @@
             localStorage.setItem('arcpay_transactions', JSON.stringify(transactions));
             loadHistory();
         }
+
+        /**
+         * LIVE FEED & BROADCAST
+         */
+        function addLiveBroadcast(amount, recipient) {
+            if (!elements.liveFeed) return;
+
+            // Clear placeholder if first real item
+            if (elements.liveFeed.innerHTML.includes('Listening for incoming payments')) {
+                elements.liveFeed.innerHTML = '';
+            }
+
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+            
+            const shortAddr = recipient.substring(0, 6) + '...' + recipient.substring(38);
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            item.innerHTML = `
+                <div class="feed-item-top">
+                    <span>Sent Transaction</span>
+                    <span>${time}</span>
+                </div>
+                <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main); margin: 0.5rem 0;">
+                    ${amount} USDC
+                </div>
+                <div class="feed-item-addr">To: ${shortAddr}</div>
+            `;
+
+            // Prepend
+            elements.liveFeed.insertBefore(item, elements.liveFeed.firstChild);
+
+            // Limit to 10 items
+            if (elements.liveFeed.children.length > 10) {
+                elements.liveFeed.removeChild(elements.liveFeed.lastChild);
+            }
+
+            // Pop-up notification (Live Broadcast)
+            showPopUpNotification(amount, shortAddr);
+        }
+
+        function showPopUpNotification(amount, recipient) {
+            const popup = document.createElement('div');
+            popup.style.position = 'fixed';
+            popup.style.bottom = '2rem';
+            popup.style.right = '2rem';
+            popup.style.background = 'var(--primary)';
+            popup.style.color = 'white';
+            popup.style.padding = '1.25rem 2rem';
+            popup.style.borderRadius = '20px';
+            popup.style.boxShadow = '0 20px 40px rgba(0,0,0,0.3)';
+            popup.style.zIndex = '2000';
+            popup.style.display = 'flex';
+            popup.style.alignItems = 'center';
+            popup.style.gap = '1rem';
+            popup.style.animation = 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            
+            popup.innerHTML = `
+                <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; font-weight: 800;">Payment Sent</div>
+                    <div style="font-weight: 800;">${amount} USDC to ${recipient}</div>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.style.animation = 'popOut 0.5s forwards';
+                setTimeout(() => popup.remove(), 500);
+            }, 5000);
+        }
+
+        const notifyStyle = document.createElement('style');
+        notifyStyle.textContent = `
+            @keyframes popIn {
+                from { opacity: 0; transform: translateY(100px) scale(0.8); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            @keyframes popOut {
+                from { opacity: 1; transform: translateY(0) scale(1); }
+                to { opacity: 0; transform: translateY(100px) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(notifyStyle);
 
         function loadHistory() {
             elements.historyList.innerHTML = "";
