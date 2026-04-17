@@ -1063,7 +1063,16 @@
             } catch (err) {
                 console.error(err);
                 let msg = err.message;
-                if (err.code === "ACTION_REJECTED") msg = "Transaction rejected by user.";
+
+                // Handle specific RPC/Provider errors
+                if (msg.includes("Unauthorized") || msg.includes("API key")) {
+                    msg = "<strong>RPC Authentication Error:</strong> Your wallet's network provider (Ankr) requires an API key. Please switch your MetaMask network RPC to a public one or use the official Sepolia network.";
+                } else if (err.code === "ACTION_REJECTED") {
+                    msg = "Transaction rejected by user.";
+                } else if (msg.includes("could not coalesce error")) {
+                    msg = "Blockchain node error. This usually means your wallet is connected to a network RPC that is restricted or down. Try switching RPCs in MetaMask settings.";
+                }
+                
                 showStatus("Transfer Failed: " + msg, "error", statusEl);
             }
         }
