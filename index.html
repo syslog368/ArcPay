@@ -92,11 +92,78 @@
             transition: all 0.2s;
             border: 1px solid var(--border);
             color: var(--text-main);
+            position: relative;
         }
         .profile-btn:hover {
             color: var(--primary);
             border-color: var(--primary);
             background: white;
+            transform: translateY(-2px);
+        }
+
+        /* Network Load Badge */
+        .load-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .load-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Modern Swap Design */
+        .swap-input-box {
+            background: var(--accent);
+            border-radius: 20px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .swap-input-box:focus-within {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            transform: scale(1.01);
+        }
+        .swap-val {
+            font-size: 1.75rem !important;
+            font-weight: 800 !important;
+            color: var(--text-main);
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            width: 100% !important;
+            outline: none !important;
+        }
+        .swap-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+        .swap-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         /* Bridge Iframe Container */
@@ -112,6 +179,15 @@
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        .pulse-view {
+            animation: pulse-border 1s 2;
+        }
+        @keyframes pulse-border {
+            0% { transform: scale(1); border-color: var(--border); }
+            50% { transform: scale(1.02); border-color: var(--primary); }
+            100% { transform: scale(1); border-color: var(--border); }
         }
 
         /* Live Feed Sidebar */
@@ -996,12 +1072,16 @@
                 <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                 <svg id="themeIconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </div>
-            <div id="headerProfileBtn" class="profile-btn" title="Profile Details">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
             <div class="wallet-status" id="connectWalletBtn">
                 <div class="status-indicator" id="statusIndicator"></div>
                 <span id="walletBtnText">Connect Wallet</span>
+            </div>
+            <div id="headerProfileBtn" class="profile-btn" title="Profile Details">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="header-live-indicator" id="liveActivityShortcut" title="View Live Activity" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: var(--accent); padding: 0.5rem 0.75rem; border-radius: 10px; border: 1px solid var(--border);">
+                <span class="pulse" style="width: 8px; height: 8px;"></span>
+                <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Live</span>
             </div>
         </div>
     </header>
@@ -1092,6 +1172,7 @@
             <div class="view-container">
                 <!-- Send / Direct Pay -->
                 <section class="card" id="sendView">
+                    <div class="load-badge">Network Load: Low</div>
                     <h2><span class="step-number">1</span>Send Payment</h2>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address.</p>
                     
@@ -1311,7 +1392,13 @@
 
                 <!-- Profile View -->
                 <section class="card hidden" id="profileView">
-                    <h2>User Data & Session</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="margin-bottom: 0;">User Profile</h2>
+                        <button class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.8rem;" onclick="switchView('send')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right: 0.4rem;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            Pay
+                        </button>
+                    </div>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Overview of your connected wallet and active session data.</p>
                     
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -1763,6 +1850,20 @@
         }
 
         elements.headerProfileBtn.addEventListener('click', () => switchView('profile'));
+        
+        const liveActivityShortcut = document.getElementById('liveActivityShortcut');
+        if (liveActivityShortcut) {
+            liveActivityShortcut.addEventListener('click', () => {
+                // If on desktop, pulse the sidebar, if on mobile, maybe show a toast or nothing special
+                if (window.innerWidth >= 1440) {
+                    const feed = document.querySelector('.live-feed-container');
+                    if (feed) {
+                        feed.classList.add('pulse-view');
+                        setTimeout(() => feed.classList.remove('pulse-view'), 2000);
+                    }
+                }
+            });
+        }
 
         async function updateProfileData() {
             if (!account) return;
