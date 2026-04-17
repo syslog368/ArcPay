@@ -181,13 +181,26 @@
             border: none;
         }
 
-        .pulse-view {
-            animation: pulse-border 1s 2;
+        /* Settings Navigation */
+        .settings-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 10px;
+            white-space: nowrap;
+            transition: all 0.2s;
         }
-        @keyframes pulse-border {
-            0% { transform: scale(1); border-color: var(--border); }
-            50% { transform: scale(1.02); border-color: var(--primary); }
-            100% { transform: scale(1); border-color: var(--border); }
+        .settings-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .settings-pane {
+            animation: fadeIn 0.3s ease-out;
         }
 
         /* Live Feed Sidebar */
@@ -1076,12 +1089,9 @@
                 <div class="status-indicator" id="statusIndicator"></div>
                 <span id="walletBtnText">Connect Wallet</span>
             </div>
-            <div id="headerProfileBtn" class="profile-btn" title="Profile Details">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
             <div class="header-live-indicator" id="liveActivityShortcut" title="View Live Activity" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: var(--accent); padding: 0.5rem 0.75rem; border-radius: 10px; border: 1px solid var(--border);">
                 <span class="pulse" style="width: 8px; height: 8px;"></span>
-                <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Live</span>
+                <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Live Feed</span>
             </div>
         </div>
     </header>
@@ -1135,13 +1145,9 @@
     <main>
         <!-- Sidebar Menu -->
         <aside class="sidebar">
-            <div class="sidebar-item" id="sidebarProfileBtn" onclick="switchView('profile')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                My Profile
-            </div>
-            <div class="sidebar-item" id="bridgeBtn" onclick="switchView('bridge')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-                Bridge Tokens
+            <div class="sidebar-item" id="sidebarHomeBtn" onclick="switchView('send')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Home
             </div>
             <div class="sidebar-item" id="settingsBtn" onclick="switchView('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1160,13 +1166,8 @@
         <div class="view-content">
             <!-- Tab Navigation -->
             <div class="mobile-view-tabs" id="navSwitcher">
-                <div class="tab active" onclick="switchView('send')">Send</div>
-                <div class="tab" onclick="switchView('request')">Request</div>
-                <div class="tab" onclick="switchView('checkout')">Checkout</div>
-                <div class="tab" onclick="switchView('wallet')">Wallet</div>
+                <div class="tab active" onclick="switchView('send')">Home</div>
                 <div class="tab" onclick="switchView('settings')">Settings</div>
-                <div class="tab" onclick="switchView('swap')">Swap</div>
-                <div class="tab" onclick="switchView('bridge')">Bridge</div>
             </div>
 
             <div class="view-container">
@@ -1198,243 +1199,158 @@
                     <div id="directTxStatus"></div>
                 </section>
 
-                <!-- Request / Link Gen -->
-                <section class="card hidden" id="requestView">
-                    <h2><span class="step-number">2</span>Payment Intent</h2>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Generate a link to receive USDC.</p>
-                    
-                    <div class="form-group">
-                        <label for="reqAddress">Your Account</label>
-                        <input type="text" id="reqAddress" placeholder="Connect wallet to sync" readonly>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="reqAmount">Requested Amount</label>
-                        <input type="number" id="reqAmount" placeholder="0.00" step="0.01">
-                    </div>
+                <!-- Request / Link Gen (Hidden, moved to Settings) -->
+                <div id="requestView" class="hidden"></div>
+                <!-- Checkout / View Link (Hidden, moved to Settings) -->
+                <div id="paymentView" class="hidden"></div>
+                <!-- Wallet / QR & History (Hidden, moved to Settings) -->
+                <div id="walletView" class="hidden"></div>
+                <!-- Swap View (Hidden, moved to Settings) -->
+                <div id="swapView" class="hidden"></div>
+                <!-- Profile View (Hidden, moved to Settings) -->
+                <div id="profileView" class="hidden"></div>
 
-                    <div class="form-group">
-                        <label for="reqDesc">Memo / Description</label>
-                        <input type="text" id="reqDesc" placeholder="e.g. Logo Design">
-                    </div>
+                <!-- Settings View (Consolidated) -->
+                <section class="card hidden" id="settingsView" style="max-width: 800px; width: 100%;">
+                    <h2>Settings & Profile</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Manage your application preferences, wallet data, and swaps.</p>
 
-                    <button id="generateLinkBtn" class="btn btn-outline">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        Create Payment Link
-                    </button>
-
-                    <div id="linkOutputContainer" class="hidden">
-                        <div class="link-box" id="paymentLink"></div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button id="copyLinkBtn" class="btn btn-primary" style="margin-top: 1rem; flex: 2;">Copy Link</button>
-                            <button id="openLinkBtn" class="btn btn-outline" style="margin-top: 1rem; flex: 1;">Open</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Checkout / View Link -->
-                <section class="card hidden" id="paymentView">
-                    <h2><span class="step-number">3</span>Checkout Flow</h2>
-                    
-                    <div id="paymentPrompt" style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.95rem; padding: 2rem; border: 2px dashed var(--border); border-radius: 16px; text-align: center;">
-                        Awaiting payment intent. Use a request link to view details.
+                    <div class="settings-nav" style="display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; border-bottom: 1px solid var(--border);">
+                        <button class="settings-tab active" onclick="showSettingsPane('general')">General</button>
+                        <button class="settings-tab" onclick="showSettingsPane('wallet')">Wallet</button>
+                        <button class="settings-tab" onclick="showSettingsPane('request')">Payment Links</button>
+                        <button class="settings-tab" onclick="showSettingsPane('swap')">Swap</button>
+                        <button class="settings-tab" onclick="showSettingsPane('profile')">Account</button>
                     </div>
 
-                    <div id="paymentDetails" class="hidden">
-                        <div class="payment-summary">
-                            <div class="summary-item">
-                                <span class="summary-label">Reference</span>
-                                <span class="summary-value" id="payDescDisp">-</span>
+                    <!-- General Settings Pane -->
+                    <div id="pane-general" class="settings-pane">
+                        <div style="display: flex; flex-direction: column; gap: 2rem;">
+                            <div class="form-group">
+                                <label>Default Network</label>
+                                <select class="btn btn-outline" style="width: 100%; text-align: left; padding-left: 1rem;" disabled>
+                                    <option>ARC Testnet (Mandatory)</option>
+                                </select>
                             </div>
-                            <div class="summary-item">
-                                <span class="summary-label">Recipient</span>
-                                <span class="summary-value" id="payToDisp">0x...</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">Amount</span>
-                                <span class="summary-value large" id="payAmountDisp">0.00 USDC</span>
-                            </div>
-                        </div>
-                        <button id="executePaymentBtn" class="btn btn-primary">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            Authorize Payment
-                        </button>
-                    </div>
-                    <div id="txStatus"></div>
-                </section>
 
-                <!-- Wallet / QR & History -->
-                <section class="card hidden" id="walletView">
-                    <h2><span class="step-number">4</span>Wallet Profile</h2>
-                    
-                    <div style="text-align: center; margin-bottom: 2rem;">
-                        <div class="balance-badge" id="balanceDisplay">Balance: 0.00 USDC</div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
-                        <!-- QR & Address Info -->
-                        <div>
-                            <label style="text-align: center;">Your Receive QR Code</label>
-                            <div id="qrcode" class="qr-container"></div>
-                            <div id="qrAddressDisp" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: -1rem; word-break: break-all;">No wallet connected</div>
-                            
-                            <div class="add-funds-info">
-                                <h4>How to Add Funds?</h4>
-                                <p>On Sepolia Testnet, you can obtain free tokens from the <a href="https://faucet.circle.com/" target="_blank" style="color: inherit; font-weight: 700;">Circle Faucet</a>.</p>
+                            <div class="form-group">
+                                <label>Appearance</label>
+                                <button id="settingsThemeToggle" class="btn btn-outline" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Switch Theme</span>
+                                    <span id="themeName">Light Mode</span>
+                                </button>
                             </div>
-                        </div>
 
-                        <!-- History Section -->
-                        <div>
-                            <label>Transaction History</label>
-                            <div id="historyList" class="history-list">
-                                <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">
-                                    No transaction records found for this account.
+                            <div class="form-group">
+                                <label>Notifications</label>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: var(--accent); padding: 1rem; border-radius: 12px;">
+                                    <span style="font-size: 0.9rem; font-weight: 600;">Browser Alerts</span>
+                                    <input type="checkbox" id="notifPush" checked>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
 
-                <!-- Settings View -->
-                <section class="card hidden" id="settingsView">
-                    <h2>Settings</h2>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Manage your application preferences and security.</p>
+                    <!-- Wallet Pane -->
+                    <div id="pane-wallet" class="settings-pane hidden">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div class="balance-badge" id="balanceDisplay">Balance: 0.00 USDC</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+                            <div>
+                                <label style="text-align: center;">Your Receive QR Code</label>
+                                <div id="qrcode" class="qr-container"></div>
+                                <div id="qrAddressDisp" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: -1rem; word-break: break-all;">No wallet connected</div>
+                            </div>
+                            <div>
+                                <label>Transaction History</label>
+                                <div id="historyList" class="history-list">
+                                    <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.85rem;">No records found.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <!-- Request Pane -->
+                    <div id="pane-request" class="settings-pane hidden">
                         <div class="form-group">
-                            <label>Default Network</label>
-                            <select class="btn btn-outline" style="width: 100%; text-align: left; padding-left: 1rem;" disabled>
-                                <option>ARC Testnet (Mandatory)</option>
-                            </select>
+                            <label for="reqAddress">Your Account</label>
+                            <input type="text" id="reqAddress" placeholder="Connect wallet to sync" readonly>
                         </div>
-
                         <div class="form-group">
-                            <label>Appearance</label>
-                            <button id="settingsThemeToggle" class="btn btn-outline" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                                <span>Switch Theme</span>
-                                <span id="themeName">Light Mode</span>
-                            </button>
+                            <label for="reqAmount">Requested Amount</label>
+                            <input type="number" id="reqAmount" placeholder="0.00" step="0.01">
                         </div>
-
                         <div class="form-group">
-                            <label>Notifications</label>
-                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--accent); padding: 1rem; border-radius: 12px;">
-                                <span style="font-size: 0.9rem; font-weight: 600;">Browser Alerts</span>
-                                <input type="checkbox" id="notifPush" checked>
+                            <label for="reqDesc">Memo / Description</label>
+                            <input type="text" id="reqDesc" placeholder="e.g. Logo Design">
+                        </div>
+                        <button id="generateLinkBtn" class="btn btn-outline" style="width: 100%;">Create Payment Link</button>
+                        <div id="linkOutputContainer" class="hidden" style="margin-top: 1.5rem;">
+                            <div class="link-box" id="paymentLink" style="word-break: break-all; padding: 1rem; background: var(--accent); border-radius: 10px; font-size: 0.8rem;"></div>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                <button id="copyLinkBtn" class="btn btn-primary" style="flex: 2;">Copy Link</button>
+                                <button id="openLinkBtn" class="btn btn-outline" style="flex: 1;">Open</button>
                             </div>
                         </div>
-                    </div>
-                </section>
-
-                <!-- Swap View -->
-                <section class="card hidden" id="swapView">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 style="margin-bottom: 0;">Swap</h2>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <div class="theme-toggle" style="width: 36px; height: 36px; background: var(--accent);">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <hr style="border: 0; border-top: 1px solid var(--border); margin: 2rem 0;">
+                        <h3>Active Checkout Flow</h3>
+                        <div id="paymentPrompt" style="margin-top: 1rem; color: var(--text-muted); font-size: 0.95rem; padding: 1.5rem; border: 2px dashed var(--border); border-radius: 16px; text-align: center;">
+                            Awaiting payment intent.
+                        </div>
+                        <div id="paymentDetails" class="hidden">
+                            <div class="payment-summary" style="margin-top: 1rem;">
+                                <div class="summary-item"><span>Reference</span><span id="payDescDisp">-</span></div>
+                                <div class="summary-item"><span>Recipient</span><span id="payToDisp">0x...</span></div>
+                                <div class="summary-item"><span>Amount</span><span id="payAmountDisp">0.00 USDC</span></div>
                             </div>
-                            <div class="theme-toggle" style="width: 36px; height: 36px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;">1.0%</div>
+                            <button id="executePaymentBtn" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Authorize Payment</button>
                         </div>
+                        <div id="txStatus"></div>
                     </div>
 
-                    <div class="swap-input-box">
-                        <span class="swap-label">Sell</span>
-                        <div class="swap-row">
-                            <input type="number" id="swapSellInput" class="swap-val" placeholder="0.00" value="0.00">
-                            <div class="token-pill">
-                                <div class="token-icon" style="background: #2775ca;">$</div>
-                                <span>USDC</span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="percent-btns">
-                        <button class="pct-btn">25%</button>
-                        <button class="pct-btn">50%</button>
-                        <button class="pct-btn">75%</button>
-                        <button class="pct-btn">Max</button>
-                    </div>
-
-                    <div class="swap-divider">
-                        <div class="swap-arrow-btn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-                        </div>
-                    </div>
-
-                    <div class="swap-input-box">
-                        <span class="swap-label">Buy</span>
-                        <div class="swap-row">
-                            <input type="number" id="swapBuyInput" class="swap-val" placeholder="0.00" value="0.00" readonly>
-                            <div class="token-pill">
-                                <div class="token-icon" style="background: #003399;">€</div>
-                                <span>EURC</span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                    <!-- Swap Pane -->
+                    <div id="pane-swap" class="settings-pane hidden">
+                        <div class="swap-input-box">
+                            <span class="swap-label">Sell</span>
+                            <div class="swap-row">
+                                <input type="number" id="swapSellInput" class="swap-val" placeholder="0.00" value="0.00">
+                                <div class="token-pill"><span>USDC</span></div>
                             </div>
                         </div>
+                        <div class="percent-btns" style="display: flex; gap: 0.5rem; margin: 1rem 0;">
+                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">25%</button>
+                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">50%</button>
+                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">75%</button>
+                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">Max</button>
+                        </div>
+                        <div class="swap-divider" style="text-align: center; margin: 0.5rem 0; color: var(--text-muted);">↓</div>
+                        <div class="swap-input-box">
+                            <span class="swap-label">Buy</span>
+                            <div class="swap-row">
+                                <input type="number" id="swapBuyInput" class="swap-val" placeholder="0.00" value="0.00" readonly>
+                                <div class="token-pill"><span>EURC</span></div>
+                            </div>
+                        </div>
+                        <button id="swapButton" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">Swap</button>
+                        <div id="swapTxStatus"></div>
                     </div>
 
-                    <button id="swapButton" class="btn btn-primary" style="margin-top: 1.5rem;">Swap</button>
-                    <div id="swapTxStatus"></div>
-                </section>
-
-                <!-- Bridge View -->
-                <section class="card hidden" id="bridgeView">
-                    <h2 style="margin-bottom: 0.5rem;">Bridge Terminals</h2>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Transfer tokens from Ethereum Sepolia to other networks safely.</p>
-                    
-                    <div class="bridge-container">
-                        <iframe src="https://zentryxapp.xyz/bridge" class="bridge-iframe" title="Bridge Protocol"></iframe>
-                    </div>
-                </section>
-
-                <!-- Profile View -->
-                <section class="card hidden" id="profileView">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 style="margin-bottom: 0;">User Profile</h2>
-                        <button class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.8rem;" onclick="switchView('send')">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right: 0.4rem;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                            Pay
-                        </button>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Overview of your connected wallet and active session data.</p>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- Account Pane -->
+                    <div id="pane-profile" class="settings-pane hidden">
                         <div class="payment-summary">
-                            <div class="summary-item">
-                                <span class="summary-label">Connection Type</span>
-                                <span class="summary-value" id="profileConnectionType">EIP-1193 (MetaMask)</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">Wallet Address</span>
-                                <span class="summary-value" id="profileAddress">-</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">Active Network</span>
-                                <span class="summary-value" id="profileNetwork">-</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="summary-label">Login Method</span>
-                                <span class="summary-value">Direct Blockchain Signature</span>
-                            </div>
+                            <div class="summary-item"><span>Connection Type</span><span id="profileConnectionType">EIP-1193</span></div>
+                            <div class="summary-item"><span>Wallet Address</span><span id="profileAddress" style="word-break: break-all;">-</span></div>
+                            <div class="summary-item"><span>Active Network</span><span id="profileNetwork">-</span></div>
                         </div>
-
-                        <div class="history-list">
+                        <div class="history-list" style="margin-top: 1.5rem;">
                             <label>Session Privileges</label>
                             <div class="history-item">
-                                <div class="history-left">
-                                    <span class="history-type">Verified?</span>
-                                    <span class="history-date">Signature provided upon connect</span>
-                                </div>
-                                <div class="history-right">
-                                    <span class="ticker-change" style="color: var(--success); font-weight: 800;">YES</span>
-                                </div>
+                                <div class="history-left"><span class="history-type">Verified?</span><span style="font-size: 0.7rem; color: var(--text-muted); display: block;">Signature provided upon connect</span></div>
+                                <div class="history-right"><span style="color: var(--success); font-weight: 800;">YES</span></div>
                             </div>
                         </div>
-
-                        <button class="btn btn-outline" style="color: var(--error); border-color: rgba(239, 68, 68, 0.2);" onclick="location.reload()">Force De-authenticate</button>
+                        <button class="btn btn-outline" style="color: var(--error); border-color: rgba(239, 68, 68, 0.2); margin-top: 2rem; width: 100%;" onclick="location.reload()">Force De-authenticate</button>
                     </div>
                 </section>
             </div>
@@ -1817,59 +1733,55 @@
         function switchView(view) {
             currentView = view;
             
-            // Update tabs
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const tabs = Array.from(document.querySelectorAll('.tab'));
-            const viewToIndex = { 'send': 0, 'request': 1, 'checkout': 2, 'wallet': 3, 'settings': 4, 'swap': 5, 'bridge': 6 };
-            if (tabs.length > 0 && viewToIndex[view] !== undefined) {
-                tabs[viewToIndex[view]].classList.add('active');
+            // Update sidebar/tab active states
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            
+            if (view === 'send') {
+                const home = document.getElementById('sidebarHomeBtn');
+                if (home) home.classList.add('active');
+                if (document.querySelectorAll('.tab')[0]) document.querySelectorAll('.tab')[0].classList.add('active');
+            } else if (view === 'settings') {
+                const sett = document.getElementById('settingsBtn');
+                if (sett) sett.classList.add('active');
+                if (document.querySelectorAll('.tab')[1]) document.querySelectorAll('.tab')[1].classList.add('active');
             }
 
             // Toggle containers
-            const views = [
-                elements.sendView, elements.requestView, elements.paymentView, 
-                elements.walletView, elements.settingsView, elements.swapView, 
-                elements.bridgeView, elements.profileView
-            ];
-            views.forEach(v => v.classList.add('hidden'));
+            elements.sendView.classList.add('hidden');
+            elements.settingsView.classList.add('hidden');
 
             if (view === 'send') elements.sendView.classList.remove('hidden');
-            if (view === 'request') elements.requestView.classList.remove('hidden');
-            if (view === 'checkout') elements.paymentView.classList.remove('hidden');
             if (view === 'settings') elements.settingsView.classList.remove('hidden');
-            if (view === 'swap') elements.swapView.classList.remove('hidden');
-            if (view === 'bridge') elements.bridgeView.classList.remove('hidden');
-            if (view === 'profile') {
-                elements.profileView.classList.remove('hidden');
-                updateProfileData();
-            }
-            if (view === 'wallet') {
-                elements.walletView.classList.remove('hidden');
-                updateBalance(); // Refresh when user explicitly visits the wallet profile
-            }
+            
+            // Refresh balance check if wallet/history is shown in settings
+            if (view === 'settings') updateBalance();
         }
 
-        elements.headerProfileBtn.addEventListener('click', () => switchView('profile'));
-        
-        const liveActivityShortcut = document.getElementById('liveActivityShortcut');
-        if (liveActivityShortcut) {
-            liveActivityShortcut.addEventListener('click', () => {
-                // If on desktop, pulse the sidebar, if on mobile, maybe show a toast or nothing special
-                if (window.innerWidth >= 1440) {
-                    const feed = document.querySelector('.live-feed-container');
-                    if (feed) {
-                        feed.classList.add('pulse-view');
-                        setTimeout(() => feed.classList.remove('pulse-view'), 2000);
-                    }
-                }
-            });
+        function showSettingsPane(paneId) {
+            // Update tabs
+            document.querySelectorAll('.settings-tab').forEach(btn => btn.classList.remove('active'));
+            const clickedBtn = event ? event.target : null;
+            if (clickedBtn) clickedBtn.classList.add('active');
+
+            // Toggle panes
+            document.querySelectorAll('.settings-pane').forEach(p => p.classList.add('hidden'));
+            document.getElementById('pane-' + paneId).classList.remove('hidden');
+
+            if (paneId === 'profile') updateProfileData();
         }
 
         async function updateProfileData() {
-            if (!account) return;
-            elements.profileAddress.textContent = account;
-            const network = await provider.getNetwork();
-            elements.profileNetwork.textContent = network.name || `Chain ID ${network.chainId}`;
+            if (!provider) return;
+            const targetAddr = account || "-";
+            const addrEl = document.getElementById('profileAddress');
+            if (addrEl) addrEl.textContent = targetAddr;
+            
+            try {
+                const network = await provider.getNetwork();
+                const netEl = document.getElementById('profileNetwork');
+                if (netEl) netEl.textContent = network.name || `Chain ID ${network.chainId}`;
+            } catch (e) { console.warn(e); }
         }
 
         // Swipe Gesture Handling
@@ -1887,18 +1799,16 @@
         }, false);
 
         function handleSwipe() {
-            const views = ['send', 'request', 'checkout', 'wallet', 'settings', 'swap', 'bridge', 'profile'];
+            const views = ['send', 'settings'];
             const currentIndex = views.indexOf(currentView);
             
             if (touchEndX < touchStartX - SWIPE_THRESHOLD) {
-                // Swipe Left (Next View)
-                const nextIndex = (currentIndex + 1) % views.length;
-                switchView(views[nextIndex]);
+                // Swipe Left
+                if (currentIndex === 0) switchView('settings');
             }
             if (touchEndX > touchStartX + SWIPE_THRESHOLD) {
-                // Swipe Right (Prev View)
-                const prevIndex = (currentIndex - 1 + views.length) % views.length;
-                switchView(views[prevIndex]);
+                // Swipe Right
+                if (currentIndex === 1) switchView('send');
             }
         }
 
