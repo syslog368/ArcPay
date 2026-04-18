@@ -10,45 +10,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- HLS.js for streaming video background -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     <style>
         [data-theme="dark"] {
-            --bg: #0a0a0a;
-            --card-bg: #141414;
-            --text-main: #f5f5f5;
-            --text-muted: #a3a3a3;
-            --primary: #ffffff;
+            --bg: #030303;
+            --card-bg: rgba(18, 18, 18, 0.7);
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --primary: #FFFFFF;
             --primary-hover: #e5e5e5;
-            --success: #34d399;
+            --success: #10B981;
             --error: #f87171;
-            --border: #262626;
-            --accent: #1a1a1a;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: rgba(255, 255, 255, 0.03);
             --disclaimer-bg: #1a1510;
             --disclaimer-border: #2d241a;
             --disclaimer-text: #fb923c;
             --modal-overlay: rgba(0, 0, 0, 0.8);
             --primary-rgb: 255, 255, 255;
-            --card-bg-rgb: 20, 20, 20;
+            --card-bg-rgb: 18, 18, 18;
             --input-bg: rgba(255, 255, 255, 0.05);
+            --glass-blur: 20px;
         }
         :root {
             /* Light Theme (Default) */
-            --bg: #fafafa;
-            --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #737373;
+            --bg: #f9fafb;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-main: #000000;
+            --text-muted: #6b7280;
             --primary: #000000;
-            --primary-hover: #262626;
+            --primary-hover: #1f2937;
             --success: #10b981;
             --error: #ef4444;
-            --border: #e5e5e5;
-            --accent: #f5f5f5;
+            --border: rgba(0, 0, 0, 0.06);
+            --accent: #f3f4f6;
             --disclaimer-bg: #fff7ed;
             --disclaimer-border: #ffedd5;
             --disclaimer-text: #9a3412;
             --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
             --gold: #f59e0b;
-            --modal-overlay: rgba(0, 0, 0, 0.4);
+            --modal-overlay: rgba(10, 10, 10, 0.4);
             --input-bg: rgba(0, 0, 0, 0.03);
+            --glass-blur: 16px;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.5;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+        }
+
+        [data-theme="dark"] body {
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 0%, #030303 100%);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         /* Price Ticker Marquee */
@@ -387,20 +419,25 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(10px);
             transition: background 0.5s ease;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
         }
 
         [data-theme="dark"] .video-bg-overlay {
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(2, 2, 2, 0.85);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 50%);
         }
 
         header {
-            padding: 1.25rem 2.5rem;
+            padding: 1.25rem 3rem;
             background: var(--card-bg);
-            opacity: 0.95;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
@@ -464,20 +501,22 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.6rem 1.25rem;
-            background: var(--text-main);
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
             color: var(--card-bg);
-            border-radius: 99px;
+            border-radius: 100px;
             font-size: 0.9rem;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .wallet-status:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
         }
 
         .status-indicator {
@@ -518,33 +557,43 @@
         .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
+            position: sticky;
+            top: 156px;
+            height: fit-content;
         }
 
         .sidebar-item {
-            padding: 1rem 1.25rem;
+            padding: 1.1rem 1.5rem;
             background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 18px;
             text-decoration: none;
             color: var(--text-main);
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            transition: all 0.2s;
+            gap: 1rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .sidebar-item:hover {
             background: var(--accent);
-            transform: translateX(4px);
+            transform: translateX(8px);
             border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
         .sidebar-item.active {
-            background: var(--accent);
+            background: var(--primary);
             border-color: var(--primary);
-            color: var(--primary);
+            color: var(--card-bg);
+            box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.2);
+        }
+        .sidebar-item.active svg {
+            color: var(--card-bg);
         }
 
         .sidebar-item svg {
@@ -573,14 +622,23 @@
 
         .card {
             background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 2.5rem;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             height: fit-content;
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .card {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%), var(--card-bg);
         }
 
         h2 {
@@ -1212,13 +1270,33 @@
 
             <div class="view-container">
                 <!-- Send / Direct Pay -->
-        <section class="card" id="sendView">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <h2><span class="step-number">1</span>Send Payment</h2>
-                <div style="font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2);">
-                    DIRECT NODE VERIFICATION
-                </div>
-            </div>
+                <section class="card" id="sendView">
+                    <div class="hero-section">
+                        <h1 class="hero-title">Institutional Asset <span class="text-gradient">Hub</span></h1>
+                        <p class="hero-subtitle">Premium direct blockchain execution specialized for high-fidelity asset management and settlements.</p>
+                        
+                        <div class="hero-metrics">
+                            <div class="metric-item">
+                                <span class="metric-value">33.2k</span>
+                                <span class="metric-label">Validator Nodes</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-value">$2.45B</span>
+                                <span class="metric-label">24h Volume</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-value">0.001s</span>
+                                <span class="metric-label">Finality</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h2><span class="step-number">1</span>Send Payment</h2>
+                        <div style="font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            DIRECT NODE VERIFICATION
+                        </div>
+                    </div>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address on-chain.</p>
                     
                     <div class="form-group">
@@ -1528,9 +1606,20 @@
         </div>
     </div>
 
-    <footer>
-        <span>ARCEC Exchange &copy; 2026</span>
-        <span>Professional Institutional Trading</span>
+    <footer style="padding: 6rem 3rem 4rem; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; border-top: 1px solid var(--border); margin-top: 6rem; background: rgba(0,0,0,0.02); backdrop-filter: blur(10px);">
+        <div class="logo" style="opacity: 0.5; filter: grayscale(1);">
+            <div class="logo-icon" style="width: 24px; height: 24px;">
+                <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                    <path d="M50 5L89 27.5V72.5L50 95L11 72.5V27.5L50 5Z" fill="none" stroke="currentColor" stroke-width="8" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            ARCEC
+        </div>
+        <div style="display: flex; gap: 2rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted);">
+            <span>Exchange &copy; 2026</span>
+            <span style="width: 1px; height: 12px; background: var(--border);"></span>
+            <span>Institutional Trading Hub</span>
+        </div>
     </footer>
 
     <script>
@@ -1795,6 +1884,31 @@
 
         function closeWalletModal() {
             document.getElementById('walletModal').classList.remove('active');
+        }
+
+        function updateRecentRecipients() {
+            const recentEl = document.getElementById('recentRecipients');
+            if (!recentEl) return;
+            
+            // Extract unique recipients from transaction history
+            const recipients = [...new Set(transactions.filter(tx => tx.type === 'sent').map(tx => tx.to))].slice(0, 5);
+            
+            if (recipients.length === 0) {
+                recentEl.innerHTML = '<span style="font-size: 0.75rem; color: var(--text-muted);">No recent recipients</span>';
+                recentEl.style.display = "none";
+                return;
+            }
+
+            recentEl.style.display = "flex";
+            recentEl.innerHTML = recipients.map(addr => `
+                <div class="recent-pill" onclick="fillRecipient('${addr}')" style="background: var(--accent); padding: 0.3rem 0.6rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+                    ${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}
+                </div>
+            `).join('');
+        }
+
+        function fillRecipient(addr) {
+            elements.directAddress.value = addr;
         }
 
         function generateQRCode(address) {
