@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArcPay | USDC Payment Gateway</title>
+    <title>ARCEC Exchange | Institutional Asset Hub</title>
     <!-- ethers.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <!-- QR Code Library -->
@@ -1082,13 +1082,55 @@
         .modal-row:last-child { margin-bottom: 0; }
 
         .modal-row span:first-child { color: var(--text-muted); }
-        .modal-row span:last-child { font-weight: 700; color: var(--text-main); }
+        /* Wallet Selector Modal */
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.75rem;
+        }
+        .wallet-option:hover {
+            border-color: var(--primary);
+            background: white;
+            transform: translateY(-2px);
+        }
+        [data-theme="dark"] .wallet-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .wallet-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 4px;
+        }
+        .wallet-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+        .wallet-tag {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 800;
+        }
     </style>
 </head>
 <body>
 
     <div class="video-bg-container">
-        <video id="bgVideo" autoplay muted loop playsinline poster="https://picsum.photos/seed/arcpay/1920/1080?blur=10">
+        <video id="bgVideo" autoplay muted loop playsinline poster="https://picsum.photos/seed/arcec/1920/1080?blur=10">
             <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260325_094440_a3592600-bd1e-49e5-9bce-a73662061d83.mp4" type="video/mp4">
         </video>
         <div class="video-bg-overlay"></div>
@@ -1098,10 +1140,11 @@
         <a href="/" class="logo">
             <div class="logo-icon">
                 <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
-                    <path d="M50 10C27.9 10 10 27.9 10 50v40h20V50c0-11 9-20 20-20s20 9 20 20v20c0 5.5-4.5 10-10 10H45v20h5c22.1 0 40-17.9 40-40V50c0-22.1-17.9-40-40-40z" fill="currentColor"/>
+                    <path d="M50 5L89 27.5V72.5L50 95L11 72.5V27.5L50 5Z" fill="none" stroke="currentColor" stroke-width="8" stroke-linejoin="round"/>
+                    <path d="M35 70L50 30L65 70M42 58H58" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            ArcPay
+            ARCEC
         </a>
         <div class="header-actions">
             <div id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">
@@ -1111,10 +1154,6 @@
             <div class="wallet-status" id="connectWalletBtn">
                 <div class="status-indicator" id="statusIndicator"></div>
                 <span id="walletBtnText">Connect Wallet</span>
-            </div>
-            <div class="header-live-indicator" id="liveActivityShortcut" title="View Live Activity" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: var(--accent); padding: 0.5rem 0.75rem; border-radius: 10px; border: 1px solid var(--border);">
-                <span class="pulse" style="width: 8px; height: 8px;"></span>
-                <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Live Feed</span>
             </div>
         </div>
     </header>
@@ -1128,18 +1167,9 @@
                     <span class="ticker-change">↑ 0.04%</span>
                 </div>
                 <div class="ticker-item">
-                    <span class="ticker-label">SWPRC</span>
-                    <span class="ticker-price">$0.7100</span>
-                    <span class="ticker-change">↑ 1.25%</span>
-                </div>
-                <div class="ticker-item">
                     <span class="ticker-label">ARC</span>
                     <span class="ticker-price">$2.4500</span>
                     <span class="ticker-change">↓ 0.12%</span>
-                </div>
-                <div class="ticker-item">
-                    <span class="ticker-label">NETWORK LOAD</span>
-                    <span class="ticker-badge">LOW</span>
                 </div>
                 <!-- Duplicate for seamless loop -->
                 <div class="ticker-item">
@@ -1148,18 +1178,9 @@
                     <span class="ticker-change">↑ 0.04%</span>
                 </div>
                 <div class="ticker-item">
-                    <span class="ticker-label">SWPRC</span>
-                    <span class="ticker-price">$0.7100</span>
-                    <span class="ticker-change">↑ 1.25%</span>
-                </div>
-                <div class="ticker-item">
                     <span class="ticker-label">ARC</span>
                     <span class="ticker-price">$2.4500</span>
                     <span class="ticker-change">↓ 0.12%</span>
-                </div>
-                <div class="ticker-item">
-                    <span class="ticker-label">NETWORK LOAD</span>
-                    <span class="ticker-badge">LOW</span>
                 </div>
             </div>
         </div>
@@ -1180,10 +1201,6 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 ArcScan Explorer
             </a>
-            <div class="sidebar-item" style="cursor: default; opacity: 0.6;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
-                Market Data
-            </div>
         </aside>
 
         <div class="view-content">
@@ -1195,13 +1212,21 @@
 
             <div class="view-container">
                 <!-- Send / Direct Pay -->
-                <section class="card" id="sendView">
-                    <h2><span class="step-number">1</span>Send Payment</h2>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address.</p>
+        <section class="card" id="sendView">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h2><span class="step-number">1</span>Send Payment</h2>
+                <div style="font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    DIRECT NODE VERIFICATION
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address on-chain.</p>
                     
                     <div class="form-group">
                         <label for="directAddress">Recipient Address</label>
                         <input type="text" id="directAddress" placeholder="0x...">
+                        <div id="recentRecipients" style="display: flex; gap: 0.5rem; margin-top: 0.75rem; overflow-x: auto; scrollbar-width: none;">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -1378,28 +1403,56 @@
             </div>
         </div>
 
-        <!-- Live Feed Sidebar (Desktop) -->
-        <aside class="live-feed-container">
-            <div class="feed-header">
-                <span>Live Activity</span>
-                <span class="pulse"></span>
-            </div>
-            <div id="liveTransactionFeed">
-                <!-- Live items populated by JS -->
-                <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem;">
-                    Listening for incoming payments...
-                </div>
-            </div>
+        <!-- Live Feed Sidebar (Hidden/Removed) -->
+        <aside class="live-feed-container" style="display: none;">
         </aside>
     </main>
 
     <section class="disclaimer-section">
         <p>
-            <strong>Disclaimer:</strong> This website is for <strong>testing purposes and a learning tool</strong>, not for profit. 
-            Any amount or value displayed on this website is <strong>not real</strong> and does not represent actual financial transactions. 
-            Please do not use this for real-world value settlements.
+            <strong>Professional Advisory:</strong> ARCEC Exchange operates via <strong>direct blockchain execution</strong>. 
+            All transactions are finalized on-chain with no intermediary processing. 
+            Ensure you have secured your private keys and verified recipient addresses before broadcasting.
         </p>
     </section>
+
+    <div id="walletModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 400px;">
+            <h3 class="modal-title">Select Wallet</h3>
+            <p class="modal-subtitle">Connect your preferred EVM compatible wallet to bridge, trade, and pay.</p>
+            
+            <div style="margin-top: 1.5rem;">
+                <div class="wallet-option" onclick="connectWallet('metamask')">
+                    <div class="wallet-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" width="24" referrerPolicy="no-referrer">
+                    </div>
+                    <span class="wallet-name">MetaMask</span>
+                    <span class="wallet-tag">Popular</span>
+                </div>
+                <div class="wallet-option" onclick="connectWallet('okx')">
+                    <div class="wallet-logo">
+                        <img src="https://www.okx.com/cdn/assets/imgs/233/EB80D2162A5A46D6.png" alt="OKX" width="24" referrerPolicy="no-referrer">
+                    </div>
+                    <span class="wallet-name">OKX Wallet</span>
+                </div>
+                <div class="wallet-option" onclick="connectWallet('rabby')">
+                    <div class="wallet-logo">
+                        <img src="https://rabby.io/assets/images/logo.png" alt="Rabby" width="24" referrerPolicy="no-referrer">
+                    </div>
+                    <span class="wallet-name">Rabby Wallet</span>
+                    <span class="wallet-tag">Power User</span>
+                </div>
+                <div class="wallet-option" onclick="connectWallet('phantom')">
+                    <div class="wallet-logo" style="background: #ab9ff2;">
+                        <img src="https://phantom.app/favicon.ico" alt="Phantom" width="20" referrerPolicy="no-referrer">
+                    </div>
+                    <span class="wallet-name">Phantom</span>
+                </div>
+            </div>
+
+            <button onclick="closeWalletModal()" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;">Cancel</button>
+        </div>
+    </div>
 
     <div id="reviewModal" class="modal-overlay">
         <div class="modal-card">
@@ -1466,7 +1519,7 @@
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </div>
             <h3 class="modal-title">Switch Network</h3>
-            <p class="modal-subtitle">ArcPay requires the ARC Testnet to function safely. Please switch your wallet to proceed.</p>
+            <p class="modal-subtitle">ARCEC requires the ARC Testnet to function safely. Please switch your wallet to proceed.</p>
             
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <button id="switchNetworkBtn" class="btn btn-primary">Switch to ARC Network</button>
@@ -1476,8 +1529,8 @@
     </div>
 
     <footer>
-        <span>ArcPay Protocol &copy; 2026</span>
-        <span>Secured by Blockchain Verification</span>
+        <span>ARCEC Exchange &copy; 2026</span>
+        <span>Professional Institutional Trading</span>
     </footer>
 
     <script>
@@ -1586,19 +1639,19 @@
             profileNetwork: document.getElementById('profileNetwork'),
         };
 
-        let transactions = JSON.parse(localStorage.getItem('arcpay_transactions') || '[]');
+        let transactions = JSON.parse(localStorage.getItem('arcec_transactions') || '[]');
 
         /**
          * INITIALIZATION
          */
         function initTheme() {
-            const savedTheme = localStorage.getItem('arcpay_theme') || 'light';
+            const savedTheme = localStorage.getItem('arcec_theme') || 'light';
             setTheme(savedTheme);
         }
 
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('arcpay_theme', theme);
+            localStorage.setItem('arcec_theme', theme);
             const isDark = theme === 'dark';
             elements.themeIconSun.style.display = isDark ? 'block' : 'none';
             elements.themeIconMoon.style.display = isDark ? 'none' : 'block';
@@ -1636,6 +1689,7 @@
             initTheme();
             initVideoBackground();
             checkUrlForPayment();
+            updateRecentRecipients();
             
             // Start automatic balance refresh every 60 seconds
             setInterval(() => {
@@ -1666,9 +1720,28 @@
             }
         }
 
-        async function connectWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                alert('Please install MetaMask to use this app.');
+        async function connectWallet(walletType = 'metamask') {
+            closeWalletModal();
+            
+            let targetProvider = null;
+            let walletName = "MetaMask";
+
+            if (walletType === 'metamask') {
+                targetProvider = window.ethereum;
+                walletName = "MetaMask";
+            } else if (walletType === 'okx') {
+                targetProvider = window.okxwallet;
+                walletName = "OKX Wallet";
+            } else if (walletType === 'phantom') {
+                targetProvider = window.phantom?.ethereum;
+                walletName = "Phantom";
+            } else if (walletType === 'rabby') {
+                targetProvider = window.rabby || window.ethereum;
+                walletName = "Rabby";
+            }
+
+            if (!targetProvider) {
+                alert(`Please install ${walletName} to use this app.`);
                 return;
             }
 
@@ -1676,7 +1749,7 @@
                 elements.walletBtnText.textContent = "Connecting...";
                 
                 // Initialize ethers provider
-                provider = new ethers.BrowserProvider(window.ethereum);
+                provider = new ethers.BrowserProvider(targetProvider);
                 
                 // Request account access
                 const accounts = await provider.send("eth_requestAccounts", []);
@@ -1684,7 +1757,7 @@
                 signer = await provider.getSigner();
 
                 // Automate ARC Network Switch
-                await ensureArcNetwork();
+                await ensureArcNetwork(targetProvider);
 
                 // Update UI
                 const shortAddr = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
@@ -1699,20 +1772,29 @@
                 // Fetch Balance
                 updateBalance();
                 loadHistory();
+                updateRecentRecipients();
 
                 // Enable payment buttons
                 if (paymentData) elements.executeBtn.disabled = false;
                 elements.directPayBtn.disabled = false;
 
-                // Handle network changes
-                window.ethereum.on('accountsChanged', (accounts) => location.reload());
-                window.ethereum.on('chainChanged', () => location.reload());
+                // Handle network/account changes
+                targetProvider.on('accountsChanged', (accounts) => location.reload());
+                targetProvider.on('chainChanged', () => location.reload());
 
             } catch (err) {
                 console.error(err);
                 elements.walletBtnText.textContent = "Connect Wallet";
-                alert("Failed to connect wallet: " + err.message);
+                alert(`Failed to connect ${walletName}: ` + err.message);
             }
+        }
+
+        function openWalletModal() {
+            document.getElementById('walletModal').classList.add('active');
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('active');
         }
 
         function generateQRCode(address) {
@@ -1747,7 +1829,7 @@
             }
         }
 
-        elements.connectBtn.addEventListener('click', connectWallet);
+        elements.connectBtn.addEventListener('click', openWalletModal);
 
         /**
          * VIEW MANAGEMENT
@@ -1927,23 +2009,22 @@
             await performTransfer();
         });
 
-        async function ensureArcNetwork() {
-            if (!window.ethereum) return false;
+        async function ensureArcNetwork(customProvider = window.ethereum) {
+            if (!customProvider) return false;
             try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const chainId = await customProvider.request({ method: 'eth_chainId' });
                 if (chainId !== ARC_TESTNET_CONFIG.chainId) {
                     elements.statusIndicator.className = 'status-indicator wrong-network';
-                    showStatus("Wrong Network! Please switch to ARC Testnet.", "loading");
                     
                     try {
-                        await window.ethereum.request({
+                        await customProvider.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: ARC_TESTNET_CONFIG.chainId }],
                         });
                         return true;
                     } catch (switchError) {
                         if (switchError.code === 4902) {
-                            await window.ethereum.request({
+                            await customProvider.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [ARC_TESTNET_CONFIG],
                             });
@@ -1966,7 +2047,8 @@
 
         elements.switchNetworkBtn.addEventListener('click', async () => {
             elements.networkModal.classList.remove('active');
-            await ensureArcNetwork();
+            // Re-attempt based on existing provider type or fall back to window.ethereum
+            await ensureArcNetwork(window.ethereum);
         });
 
         elements.networkModalCloseBtn.addEventListener('click', () => {
@@ -2081,8 +2163,9 @@
             transactions.unshift(tx);
             // Limit to last 20
             if (transactions.length > 20) transactions.pop();
-            localStorage.setItem('arcpay_transactions', JSON.stringify(transactions));
+            localStorage.setItem('arcec_transactions', JSON.stringify(transactions));
             loadHistory();
+            updateRecentRecipients();
         }
 
         elements.swapButton.addEventListener('click', performSwap);

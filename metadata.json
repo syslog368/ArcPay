@@ -1,6 +1,6 @@
 {
-  "name": "ArcPay USDC",
-  "description": "A browser-based USDC payment system for EVM networks. Connect wallet, generate payment requests, and pay USDC directly.",
+  "name": "ARCEC Exchange",
+  "description": "A professional institutional asset hub and USDC payment gateway. Connect wallet, trade assets, and institutional-grade payments.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
