@@ -12,7 +12,7 @@
     <style>
         :root {
             --bg: #0f111a;
-            --card-bg: #1a1d2e;
+            --card-bg: #161926;
             --primary: #5e5ce6;
             --secondary: #bf5af2;
             --accent: #2c2f48;
@@ -22,92 +22,8 @@
             --success: #32d74b;
             --error: #ff453a;
             --font: 'Plus Jakarta Sans', sans-serif;
-            --glow: rgba(94, 92, 230, 0.15);
-        }
-
-        /* Wallet Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(12px);
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 32px;
-            width: 90%;
-            max-width: 380px;
-            padding: 32px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-        }
-
-        .wallet-option {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .wallet-option:hover {
-            border-color: var(--primary);
-            background: rgba(94, 92, 230, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .wallet-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-        }
-
-        .wallet-name {
-            font-weight: 700;
-            font-size: 1rem;
-        }
-
-        .connected-badge {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: rgba(50, 215, 75, 0.1);
-            color: var(--success);
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(50, 215, 75, 0.2);
-            backdrop-filter: blur(4px);
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        @keyframes fadeInScale { 
-            from { opacity: 0; transform: translateY(20px) scale(0.98); } 
-            to { opacity: 1; transform: translateY(0) scale(1); } 
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            --glow: rgba(94, 92, 230, 0.3);
+            --arc-purple: #8b5cf6;
         }
 
         * {
@@ -123,270 +39,295 @@
             background-color: var(--bg);
             color: var(--text);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             min-height: 100vh;
-            padding: 24px;
-            overflow: hidden;
+            padding: 40px 24px;
+            overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(94, 92, 230, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.1) 0%, transparent 40%);
+                radial-gradient(circle at 10% 20%, rgba(94, 92, 230, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.08) 0%, transparent 40%);
         }
 
         .container {
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             position: relative;
             animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Gradient Glow behind card */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120%;
-            height: 120%;
-            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
-            z-index: -1;
-            filter: blur(40px);
+        /* Animations */
+        @keyframes fadeInScale { 
+            from { opacity: 0; transform: translateY(20px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px var(--glow); }
+            50% { box-shadow: 0 0 30px var(--glow); }
+            100% { box-shadow: 0 0 15px var(--glow); }
         }
 
+        /* Card System */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 32px;
             padding: 32px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
             position: relative;
-            overflow: hidden;
+            z-index: 10;
         }
 
-        /* Header & Mode Switcher */
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .brand-logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 24px;
-            filter: drop-shadow(0 0 15px var(--glow));
-            animation: fadeInScale 1s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-        }
-
-        .logo-svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .logo-gradient-1 { stop-color: #ffffff; }
-        .logo-gradient-2 { stop-color: #a0aec0; }
-        .logo-gradient-3 { stop-color: #e2e8f0; }
-
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 20px;
-        }
-
-        .tabs {
-            display: flex;
-            background: var(--accent);
-            padding: 4px;
-            border-radius: 100px;
-            position: relative;
-            margin: 0 auto 32px;
-            width: fit-content;
-            border: 1px solid var(--border);
-        }
-
-        .tab {
-            padding: 8px 24px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-radius: 100px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            z-index: 2;
-        }
-
-        .tab.active {
-            color: var(--text);
-        }
-
-        .tab-indicator {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            height: calc(100% - 8px);
-            width: calc(50% - 4px);
-            background: var(--primary);
-            border-radius: 100px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1;
-            box-shadow: 0 4px 12px rgba(94, 92, 230, 0.3);
-        }
-
-        .tabs.swipe-active .tab-indicator {
-            transform: translateX(100%);
-            background: var(--secondary);
-            box-shadow: 0 4px 12px rgba(191, 90, 242, 0.3);
-        }
-
-        /* Common Elements */
-        .input-box {
-            background: var(--accent);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-            transition: all 0.2s;
-        }
-
-        .input-box:focus-within {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .label-row {
+        /* Header & Wallet */
+        .header-nav {
             display: flex;
             justify-content: space-between;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            letter-spacing: 0.05em;
+            align-items: center;
+            margin-bottom: 32px;
         }
 
-        .balance {
-            color: var(--primary);
-            cursor: pointer;
-        }
-
-        .input-row {
+        .brand-section {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 1.25rem;
-            font-weight: 700;
-            outline: none;
-            font-family: inherit;
+        .logo-small {
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 0 8px var(--glow));
         }
 
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.1);
-        }
-
-        .token-tag {
-            font-weight: 800;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Swipe Mode Styles */
-        .swipe-content {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 10px 0;
-        }
-
-        .swipe-content.active {
-            display: flex;
-        }
-
-        .rate-info {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 32px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-weight: 600;
-        }
-
-        .swipe-track {
-            width: 100%;
-            height: 72px;
-            background: var(--accent);
-            border-radius: 100px;
+        .wallet-nav {
             position: relative;
-            padding: 6px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .swipe-text {
+        .connected-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .connected-badge:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+        }
+
+        .badge-logo {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Wallet Dropdown */
+        .wallet-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 200px;
+            padding: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 50;
+            animation: fadeInScale 0.2s ease-out;
+        }
+
+        .wallet-dropdown.active { display: block; }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            border-radius: 12px;
             font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .dropdown-item:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .dropdown-item.danger {
+            color: var(--error);
+        }
+        
+        .dropdown-item.danger:hover {
+            background: rgba(255, 69, 58, 0.05);
+        }
+
+
+        /* Balance Area */
+        .balance-hero {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: linear-gradient(180deg, rgba(94, 92, 230, 0.05), transparent);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--text-muted);
-            z-index: 1;
-            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
         }
 
-        .swipe-handle {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            width: 60px;
-            height: 60px;
-            background: var(--secondary);
-            border-radius: 50%;
+        .main-balance {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: white;
+            text-shadow: 0 0 20px var(--glow);
+        }
+
+        .euro-balance {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        /* Tabs */
+        .tabs {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            z-index: 3;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s ease-out;
+            background: rgba(0,0,0,0.2);
+            padding: 4px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
         }
 
-        .swipe-handle:active {
-            cursor: grabbing;
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.25s;
+            color: var(--text-muted);
         }
 
-        .swipe-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, transparent, rgba(191, 90, 242, 0.2));
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* Action Button */
-        .btn-main {
-            width: 100%;
-            padding: 18px;
+        .tab.active {
             background: var(--primary);
             color: white;
+            box-shadow: 0 4px 12px rgba(94, 92, 230, 0.3);
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .input-container {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .input-container:focus-within {
+            border-color: var(--primary);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .input-container input {
+            background: transparent;
             border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            width: 100%;
+            outline: none;
+        }
+
+        .input-container input::placeholder { color: rgba(255,255,255,0.1); }
+
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .output-highlight {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(50, 215, 75, 0.05);
+            border-radius: 14px;
+            border: 1px dashed rgba(50, 215, 75, 0.2);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--success);
+            display: none;
+        }
+
+        .output-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+
+        /* Fee Row */
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 4px;
+            margin-top: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .fee-value { color: white; opacity: 0.8; }
+
+        /* Action Buttons */
+        .btn-action {
+            width: 100%;
+            padding: 18px;
             border-radius: 20px;
+            border: none;
             font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
@@ -395,483 +336,677 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
+            background: var(--primary);
+            color: white;
             box-shadow: 0 8px 24px rgba(94, 92, 230, 0.2);
         }
 
-        .btn-main:hover {
+        .btn-action:hover {
             transform: translateY(-2px);
-            opacity: 0.9;
+            opacity: 0.95;
+            box-shadow: 0 12px 30px rgba(94, 92, 230, 0.3);
         }
 
-        .btn-main:active {
-            transform: scale(0.98);
-        }
+        .btn-action:active { transform: scale(0.98); }
 
-        .btn-main.sending {
-            background: var(--accent);
+        .btn-action:disabled {
+            background: #2c2f48;
             cursor: not-allowed;
             color: var(--text-muted);
+            transform: none;
             box-shadow: none;
         }
 
-        /* Feedback Boxes */
-        .feedback {
-            margin-top: 24px;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-align: center;
-            display: none;
-            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* History Section */
+        .history-section {
+            margin-top: 40px;
+            animation: fadeIn 0.8s ease-out;
         }
 
-        .feedback.success { background: rgba(50, 215, 75, 0.1); color: var(--success); display: block; }
-        .feedback.error { background: rgba(255, 69, 58, 0.1); color: var(--error); display: block; }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tx-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tx-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            transform: scale(1.01);
+        }
+
+        .tx-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tx-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .tx-info h5 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .tx-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .tx-amount {
+            text-align: right;
+        }
+
+        .amt-val {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: white;
+            display: block;
+        }
+
+        .tx-hash-short {
+            font-size: 0.7rem;
+            color: var(--primary);
+            font-weight: 700;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+
+        /* Modals/Toasts */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 16px 24px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .toast.active { transform: translateX(-50%) translateY(0); }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast.success .toast-icon { background: var(--success); color: white; }
+        .toast.error .toast-icon { background: var(--error); color: white; }
 
         .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
             border-top-color: white;
+            border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Wallet Selection Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            width: 90%;
+            max-width: 400px;
+            padding: 32px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wallet-option:hover {
+            border-color: var(--primary);
+            background: rgba(94, 92, 230, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .wallet-logo-lg {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: white;
+            padding: 4px;
+            object-fit: contain;
+        }
+
+        .wallet-info-main h4 { font-weight: 700; font-size: 1rem; }
+        .wallet-info-main p { font-size: 0.75rem; color: var(--text-muted); }
 
         .hidden { display: none !important; }
+
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="card">
-            <div id="walletBadge" class="connected-badge">
-                <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div>
-                <span id="connectedAddr">0x...</span>
+        <!-- Header Nav -->
+        <div class="header-nav">
+            <div class="brand-section">
+                <svg viewBox="0 0 100 100" class="logo-small" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="100%" stop-color="#5e5ce6" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M50 15 C25 15, 15 40, 15 85 L32 85 C32 50, 40 38, 50 38 C60 38, 68 50, 68 85 L85 85 C85 40, 75 15, 50 15" fill="url(#logoGrad)" />
+                    <path d="M42 65 L65 65 L60 75 L38 75 Z" fill="#ffffff" opacity="0.8" />
+                </svg>
+                <div style="font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em;">ArcEX</div>
             </div>
-            <div class="header">
-                <!-- Premium SVG Logo Reconstruction: New Arc Style -->
-                <div class="brand-logo">
-                    <svg viewBox="0 0 100 100" class="logo-svg" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" class="logo-gradient-1" />
-                                <stop offset="100%" class="logo-gradient-2" />
-                            </linearGradient>
-                        </defs>
-                        <!-- Stylized Bold 'A' mimicking the new design -->
-                        <path d="M50 15 
-                                 C25 15, 15 40, 15 85 
-                                 L32 85 
-                                 C32 50, 40 38, 50 38 
-                                 C60 38, 68 50, 68 85 
-                                 L85 85 
-                                 C85 40, 75 15, 50 15" 
-                              fill="url(#logoGrad)" />
-                        <path d="M42 65 L65 65 L60 75 L38 75 Z" fill="url(#logoGrad)" opacity="0.8" />
-                    </svg>
+
+            <div class="wallet-nav">
+                <div id="connectBtn" class="connected-badge" style="background: var(--primary); color: white; border: none; padding: 10px 20px;" onclick="openWalletModal()">
+                    <i data-lucide="wallet" size="16"></i>
+                    <span>Connect</span>
                 </div>
-                <h1>Send USDC</h1>
-                <div class="tabs" id="modeTabs">
-                    <div class="tab active" id="payTab">Pay</div>
-                    <div class="tab" id="swipeTab">Swipe</div>
-                    <div class="tab-indicator"></div>
+                
+                <div id="walletBadge" class="connected-badge hidden" onclick="toggleDropdown()">
+                    <img id="badgeLogo" src="" alt="" class="badge-logo">
+                    <span id="connectedAddr">0x...</span>
+                    <i data-lucide="chevron-down" size="14"></i>
                 </div>
+
+                <div id="walletDropdown" class="wallet-dropdown">
+                    <div class="dropdown-item" onclick="copyAddress()">
+                        <i data-lucide="copy" size="14"></i> Copy Address
+                    </div>
+                    <div class="dropdown-item" onclick="window.open('https://rpc.testnet.arc.network', '_blank')">
+                        <i data-lucide="external-link" size="14"></i> View Explorer
+                    </div>
+                    <div class="dropdown-item danger" onclick="disconnectWallet()" style="border-top: 1px solid var(--border); margin-top: 8px; padding-top: 14px;">
+                        <i data-lucide="log-out" size="14"></i> Disconnect
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="balance-hero">
+                <div class="balance-label">Total Balance</div>
+                <div class="main-balance" id="usdcBalance">0.00 USDC</div>
+                <div class="euro-balance" id="eurcBalance">0.00 EURC</div>
+            </div>
+
+            <div class="tabs" id="modeTabs">
+                <div class="tab active" id="payTab" onclick="switchMode('pay')">Pay</div>
+                <div class="tab" id="swipeTab" onclick="switchMode('swipe')">Swipe</div>
             </div>
 
             <!-- Pay Mode Content -->
             <div id="payContent">
-                <div class="input-box">
-                    <div class="label-row">
-                        <span>Amount</span>
-                        <span class="balance" onclick="setMax()">Balance: <span id="usdcBal">1000</span> USDC</span>
+                <div class="input-group">
+                    <div class="input-header">
+                        <span class="label">Amount</span>
+                        <span class="label" style="color: var(--primary); cursor: pointer;" onclick="setMax()">Max</span>
                     </div>
-                    <div class="input-row">
-                        <input type="number" id="payAmount" placeholder="0.00">
-                        <span class="token-tag">USDC</span>
-                    </div>
-                </div>
-
-                <div class="input-box">
-                    <div class="label-row">
-                        <span>Recipient Address</span>
-                    </div>
-                    <div class="input-row">
-                        <input type="text" id="recipient" placeholder="0x... or name">
+                    <div class="input-container">
+                        <input type="number" id="payAmount" placeholder="0.00" oninput="handleAmountInput()">
+                        <div class="token-info">USDC</div>
                     </div>
                 </div>
 
-                <button class="btn-main" id="payBtn" onclick="handlePayAction()">
-                    <i data-lucide="wallet" size="18" id="payBtnIcon"></i>
-                    <span id="payBtnText">Connect Wallet</span>
+                <div class="input-group">
+                    <div class="input-header">
+                        <span class="label">Recipient Address</span>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="recipient" placeholder="0x... or ENS">
+                    </div>
+                </div>
+
+                <div id="receivePreviewPay" class="output-highlight">
+                    You will send: <span class="output-value" id="previewValPay">0.00</span> USDC
+                </div>
+
+                <div class="fee-row">
+                    <span>Estimated Gas Fee</span>
+                    <span class="fee-value" id="gasFeePay">0.01 USDC</span>
+                </div>
+
+                <button class="btn-action" id="payBtn" onclick="handleTransaction('PAY')">
+                    <i data-lucide="send" size="20"></i>
+                    <span>Send Stablecoin</span>
                 </button>
             </div>
 
             <!-- Swipe Mode Content -->
-            <div id="swipeContent" class="swipe-content">
-                <div class="rate-info">
-                    1 USDC ≈ 0.99 EURC
-                </div>
-                
-                <div class="input-box" style="width: 100%; margin-bottom: 24px;">
-                    <div class="label-row">
-                        <span>Converting</span>
-                        <span class="balance">Balance: <span id="swipeUsdcBal">1000</span> USDC</span>
+            <div id="swipeContent" class="hidden">
+                <div class="input-group">
+                    <div class="input-header">
+                        <span class="label">From</span>
                     </div>
-                    <div class="input-row">
-                        <input type="number" id="swipeAmount" placeholder="10.00" oninput="updateConverted()">
-                        <span class="token-tag">USDC</span>
-                    </div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; text-align: left;">
-                        Receive: <span style="color: white; font-weight: 700;" id="convertedVal">9.90</span> EURC
+                    <div class="input-container">
+                        <input type="number" id="swipeAmount" placeholder="0.00" oninput="handleAmountInput()">
+                        <div class="token-info">USDC</div>
                     </div>
                 </div>
 
-                <div class="swipe-track" id="swipeTrack" onclick="handleSwipeClick()">
-                    <div class="swipe-progress" id="swipeProgress"></div>
-                    <div class="swipe-text" id="swipeText">Connect Wallet to Swipe</div>
-                    <div class="swipe-handle" id="swipeHandle">
-                        <i data-lucide="wallet" color="white" size="24" id="swipeHandleIcon"></i>
-                    </div>
+                <div id="receivePreviewSwipe" class="output-highlight" style="display: block;">
+                    You will receive: <span class="output-value" id="previewValSwipe">0.00</span> EURC
                 </div>
 
-                <div style="margin-top: 16px; font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
-                    Your EURC Vault: <span style="color: white;" id="eurcBal">500</span> EURC
+                <div class="fee-row">
+                    <span>Execution Fee</span>
+                    <span class="fee-value">0.01 USDC</span>
+                </div>
+
+                <button class="btn-action" id="swipeBtn" onclick="handleTransaction('SWIPE')" style="background: var(--secondary); box-shadow: 0 8px 24px rgba(191,90,242,0.2);">
+                    <i data-lucide="zap" size="20"></i>
+                    <span>Convert Instantly</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <div class="section-header">
+                <h4 style="font-weight: 800; font-size: 1rem;">Recent Transactions</h4>
+                <span style="font-size: 0.75rem; color: var(--primary); cursor: pointer; font-weight: 700;" onclick="clearHistory()">Clear</span>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- Tx items injected here -->
+                <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.85rem;">
+                    No recent activity
                 </div>
             </div>
-
-            <div id="feedback" class="feedback"></div>
         </div>
     </div>
 
-    <div id="walletModal" class="modal-overlay">
+    <!-- Modals -->
+    <div id="walletModal" class="modal-overlay" onclick="handleOverlayClick(event)">
         <div class="modal">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3 style="font-weight: 800;">Connect Wallet</h3>
+                <h3 style="font-weight: 800;">Select Wallet</h3>
                 <i data-lucide="x" style="cursor: pointer; opacity: 0.5;" onclick="closeWalletModal()"></i>
             </div>
-            <div class="wallet-option" onclick="connectWallet('OKX')">
-                <img src="https://picsum.photos/seed/okx/64/64" alt="OKX" class="wallet-icon" referrerpolicy="no-referrer">
-                <div class="wallet-name">OKX Wallet</div>
+            
+            <div class="wallet-option" onclick="connectWallet('MetaMask', 'wallet_metamask.png')">
+                <img src="wallet_metamask.png" alt="MetaMask" class="wallet-logo-lg" onerror="this.src='https://picsum.photos/seed/meta/64/64'">
+                <div class="wallet-info-main">
+                    <h4>MetaMask</h4>
+                    <p>Browser Extension</p>
+                </div>
             </div>
-            <div class="wallet-option" onclick="connectWallet('Phantom')">
-                <img src="https://picsum.photos/seed/phantom/64/64" alt="Phantom" class="wallet-icon" referrerpolicy="no-referrer">
-                <div class="wallet-name">Phantom</div>
+
+            <div class="wallet-option" onclick="connectWallet('Phantom', 'wallet_phantom.png')">
+                <img src="wallet_phantom.png" alt="Phantom" class="wallet-logo-lg" onerror="this.src='https://picsum.photos/seed/phan/64/64'">
+                <div class="wallet-info-main">
+                    <h4>Phantom</h4>
+                    <p>Multi-chain Wallet</p>
+                </div>
             </div>
-            <div class="wallet-option" onclick="connectWallet('MetaMask')">
-                <img src="https://picsum.photos/seed/metamask/64/64" alt="MetaMask" class="wallet-icon" referrerpolicy="no-referrer">
-                <div class="wallet-name">MetaMask</div>
+
+            <div class="wallet-option" onclick="connectWallet('OKX', 'wallet_okx.png')">
+                <img src="wallet_okx.png" alt="OKX" class="wallet-logo-lg" onerror="this.src='https://picsum.photos/seed/okx/64/64'">
+                <div class="wallet-info-main">
+                    <h4>OKX Wallet</h4>
+                    <p>Web3 Ecosystem</p>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div id="toastMsg" style="font-weight: 700; font-size: 0.85rem;"></div>
     </div>
 
     <script>
-        // Init Icons
+        // Init Lucide Icons
         lucide.createIcons();
 
-        // App States
+        // Constants
+        const ARCSCAN_ROOT = "https://rpc.testnet.arc.network"; // User requested this as explorer link
+        const SWIPE_RATE = 0.992;
+        const GAS_FEE = 0.01;
+
+        // App Logic
         let state = {
-            mode: 'pay', // 'pay' or 'swipe'
-            balances: {
-                usdc: 1000.00,
-                eurc: 500.00
-            },
+            mode: 'pay',
+            balances: { usdc: 1250.45, eurc: 420.00 },
             isProcessing: false,
-            rate: 0.99,
-            wallet: {
-                connected: false,
-                address: null,
-                provider: null
-            }
+            wallet: JSON.parse(localStorage.getItem('arcex_wallet')) || { connected: false, address: null, provider: null, logo: null },
+            history: JSON.parse(localStorage.getItem('arcex_history')) || []
         };
 
-        // DOM Elements
         const elements = {
-            payTab: document.getElementById('payTab'),
-            swipeTab: document.getElementById('swipeTab'),
-            modeTabs: document.getElementById('modeTabs'),
+            usdcBalance: document.getElementById('usdcBalance'),
+            eurcBalance: document.getElementById('eurcBalance'),
+            connectBtn: document.getElementById('connectBtn'),
+            walletBadge: document.getElementById('walletBadge'),
+            connectedAddr: document.getElementById('connectedAddr'),
+            badgeLogo: document.getElementById('badgeLogo'),
+            walletDropdown: document.getElementById('walletDropdown'),
+            walletModal: document.getElementById('walletModal'),
             payContent: document.getElementById('payContent'),
             swipeContent: document.getElementById('swipeContent'),
-            usdcBal: document.getElementById('usdcBal'),
-            swipeUsdcBal: document.getElementById('swipeUsdcBal'),
-            eurcBal: document.getElementById('eurcBal'),
+            tabPay: document.getElementById('payTab'),
+            tabSwipe: document.getElementById('swipeTab'),
             payAmount: document.getElementById('payAmount'),
-            recipient: document.getElementById('recipient'),
-            payBtn: document.getElementById('payBtn'),
-            payBtnText: document.getElementById('payBtnText'),
-            payBtnIcon: document.getElementById('payBtnIcon'),
-            feedback: document.getElementById('feedback'),
             swipeAmount: document.getElementById('swipeAmount'),
-            convertedVal: document.getElementById('convertedVal'),
-            swipeHandle: document.getElementById('swipeHandle'),
-            swipeHandleIcon: document.getElementById('swipeHandleIcon'),
-            swipeTrack: document.getElementById('swipeTrack'),
-            swipeProgress: document.getElementById('swipeProgress'),
-            swipeText: document.getElementById('swipeText'),
-            walletModal: document.getElementById('walletModal'),
-            walletBadge: document.getElementById('walletBadge'),
-            connectedAddr: document.getElementById('connectedAddr')
+            recipient: document.getElementById('recipient'),
+            previewValPay: document.getElementById('previewValPay'),
+            previewValSwipe: document.getElementById('previewValSwipe'),
+            payBtn: document.getElementById('payBtn'),
+            swipeBtn: document.getElementById('swipeBtn'),
+            historyList: document.getElementById('historyList'),
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toastMsg'),
+            toastIcon: document.getElementById('toastIcon'),
+            receivePreviewPay: document.getElementById('receivePreviewPay'),
+            receivePreviewSwipe: document.getElementById('receivePreviewSwipe')
         };
 
         /**
-         * WALLET LOGIC
+         * INITIALIZATION
          */
-        function openWalletModal() {
-            elements.walletModal.style.display = 'flex';
+        function initApp() {
+            updateBalances();
+            renderHistory();
+            if (state.wallet.connected) {
+                updateUIForWallet();
+            }
         }
 
-        function closeWalletModal() {
-            elements.walletModal.style.display = 'none';
+        /**
+         * WALLET CORE
+         */
+        function openWalletModal() { elements.walletModal.style.display = 'flex'; }
+        function closeWalletModal() { elements.walletModal.style.display = 'none'; }
+        
+        function handleOverlayClick(e) {
+            if (e.target === elements.walletModal) closeWalletModal();
         }
 
-        async function connectWallet(provider) {
-            state.wallet.connected = true;
-            state.wallet.provider = provider;
-            // Simulated random address
-            state.wallet.address = '0x' + Array.from({length: 8}, () => Math.floor(Math.random() * 16).toString(16)).join('') + '...' + Array.from({length: 4}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        async function connectWallet(provider, logo) {
+            // Simulated connection delay
+            showToast("Connecting...", "info");
             
-            closeWalletModal();
+            setTimeout(() => {
+                const dummyAddr = '0x' + Array.from({length: 4}, () => Math.floor(Math.random() * 16).toString(16)).join('') + '...' + Array.from({length: 4}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                state.wallet = { 
+                    connected: true, 
+                    address: dummyAddr, 
+                    provider: provider, 
+                    logo: logo 
+                };
+                localStorage.setItem('arcex_wallet', JSON.stringify(state.wallet));
+                
+                updateUIForWallet();
+                closeWalletModal();
+                showToast(`${provider} Connected`, "success");
+            }, 800);
+        }
+
+        function disconnectWallet() {
+            state.wallet = { connected: false, address: null, provider: null, logo: null };
+            localStorage.removeItem('arcex_wallet');
+            elements.walletDropdown.classList.remove('active');
             updateUIForWallet();
-            showFeedback(`${provider} connected successfully!`, 'success');
+            showToast("Wallet Disconnected", "info");
         }
 
         function updateUIForWallet() {
             if (state.wallet.connected) {
-                elements.walletBadge.style.display = 'flex';
+                elements.connectBtn.classList.add('hidden');
+                elements.walletBadge.classList.remove('hidden');
                 elements.connectedAddr.textContent = state.wallet.address;
-                
-                // Update Pay Button
-                elements.payBtnText.textContent = "Send USDC";
-                elements.payBtnIcon.setAttribute('data-lucide', 'send');
-                
-                // Update Swipe Track
-                elements.swipeText.textContent = "Swipe to Convert";
-                elements.swipeHandleIcon.setAttribute('data-lucide', 'chevron-right');
+                elements.badgeLogo.src = state.wallet.logo;
+                elements.badgeLogo.onerror = () => { elements.badgeLogo.src = `https://picsum.photos/seed/${state.wallet.provider}/64/64`; };
             } else {
-                elements.walletBadge.style.display = 'none';
-                elements.payBtnText.textContent = "Connect Wallet";
-                elements.payBtnIcon.setAttribute('data-lucide', 'wallet');
-                elements.swipeText.textContent = "Connect Wallet to Swipe";
-                elements.swipeHandleIcon.setAttribute('data-lucide', 'wallet');
-            }
-            lucide.createIcons();
-        }
-
-        function handlePayAction() {
-            if (!state.wallet.connected) {
-                openWalletModal();
-            } else {
-                handlePay();
+                elements.connectBtn.classList.remove('hidden');
+                elements.walletBadge.classList.add('hidden');
             }
         }
 
-        function handleSwipeClick() {
-            if (!state.wallet.connected) {
-                openWalletModal();
-            }
+        function toggleDropdown() {
+            elements.walletDropdown.classList.toggle('active');
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText("0x742d12b0e91ed0261971167123985b1e93c12b1a");
+            showToast("Address Copied", "success");
+            elements.walletDropdown.classList.remove('active');
         }
 
         /**
-         * MODE TOGGLE LOGIC
+         * ACTIONS & PREVIEWS
          */
-        elements.payTab.addEventListener('click', () => switchMode('pay'));
-        elements.swipeTab.addEventListener('click', () => switchMode('swipe'));
-
         function switchMode(mode) {
             state.mode = mode;
-            elements.payTab.classList.toggle('active', mode === 'pay');
-            elements.swipeTab.classList.toggle('active', mode === 'swipe');
-            elements.modeTabs.classList.toggle('swipe-active', mode === 'swipe');
-            
+            elements.tabPay.classList.toggle('active', mode === 'pay');
+            elements.tabSwipe.classList.toggle('active', mode === 'swipe');
             elements.payContent.classList.toggle('hidden', mode !== 'pay');
-            elements.swipeContent.classList.toggle('active', mode === 'swipe');
-            
-            hideFeedback();
-            resetSwipe();
-            updateBalances();
+            elements.swipeContent.classList.toggle('hidden', mode !== 'swipe');
         }
 
-        /**
-         * BALANCE UPDATE LOGIC
-         */
-        function updateBalances() {
-            elements.usdcBal.textContent = state.balances.usdc.toFixed(2);
-            elements.swipeUsdcBal.textContent = state.balances.usdc.toFixed(2);
-            elements.eurcBal.textContent = state.balances.eurc.toFixed(2);
+        function handleAmountInput() {
+            const amt = parseFloat(state.mode === 'pay' ? elements.payAmount.value : elements.swipeAmount.value) || 0;
+            
+            if (state.mode === 'pay') {
+                elements.previewValPay.textContent = amt.toFixed(2);
+                elements.receivePreviewPay.style.display = amt > 0 ? "block" : "none";
+            } else {
+                elements.previewValSwipe.textContent = (amt * SWIPE_RATE).toFixed(2);
+                elements.receivePreviewSwipe.style.display = amt > 0 ? "block" : "none";
+            }
         }
 
         function setMax() {
-            elements.payAmount.value = state.balances.usdc;
+            elements.payAmount.value = (state.balances.usdc - GAS_FEE).toFixed(2);
+            handleAmountInput();
         }
 
-        function updateConverted() {
-            const val = parseFloat(elements.swipeAmount.value) || 0;
-            elements.convertedVal.textContent = (val * state.rate).toFixed(2);
+        function updateBalances() {
+            elements.usdcBalance.textContent = `${state.balances.usdc.toLocaleString(undefined, {minimumFractionDigits: 2})} USDC`;
+            elements.eurcBalance.textContent = `${state.balances.eurc.toLocaleString(undefined, {minimumFractionDigits: 2})} EURC`;
         }
 
         /**
-         * PAY FEATURE LOGIC
+         * TRANSACTION LOGIC
          */
-        async function handlePay() {
-            if (state.isProcessing) return;
-            
-            const amt = parseFloat(elements.payAmount.value);
-            const rcpt = elements.recipient.value.trim();
-
-            if (!amt || amt <= 0) {
-                showFeedback("Please enter a valid amount.", "error");
-                return;
-            }
-            if (amt > state.balances.usdc) {
-                showFeedback("Insufficient USDC balance.", "error");
-                return;
-            }
-            if (!rcpt) {
-                showFeedback("Please enter a recipient address.", "error");
+        async function handleTransaction(type) {
+            if (!state.wallet.connected) {
+                showToast("Connect Wallet First", "error");
+                openWalletModal();
                 return;
             }
 
-            // Simulate sending
+            const input = type === 'PAY' ? elements.payAmount : elements.swipeAmount;
+            const amt = parseFloat(input.value) || 0;
+
+            // Errors
+            if (amt <= 0) return showToast("Enter a valid amount", "error");
+            if (amt + GAS_FEE > state.balances.usdc) return showToast("Insufficient Balance", "error");
+            if (type === 'PAY' && !elements.recipient.value) return showToast("Invalid Recipient", "error");
+
             state.isProcessing = true;
-            elements.payBtn.innerHTML = `<div class="spinner"></div> Sending...`;
-            elements.payBtn.classList.add('sending');
-            hideFeedback();
+            const btn = type === 'PAY' ? elements.payBtn : elements.swipeBtn;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="spinner"></div> Processing...`;
+            btn.disabled = true;
 
+            // Simulate Network Delay
             setTimeout(() => {
-                state.balances.usdc -= amt;
-                state.isProcessing = false;
-                elements.payBtn.innerHTML = `<i data-lucide="send" size="18"></i> Send USDC`;
-                elements.payBtn.classList.remove('sending');
-                lucide.createIcons();
+                const txHash = '0x' + Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                // Update State
+                if (type === 'PAY') {
+                    state.balances.usdc -= (amt + GAS_FEE);
+                    saveTransaction({
+                        id: txHash,
+                        type: 'Payment',
+                        amount: amt,
+                        token: 'USDC',
+                        status: 'Success',
+                        timestamp: Date.now()
+                    });
+                } else {
+                    const received = amt * SWIPE_RATE;
+                    state.balances.usdc -= (amt + GAS_FEE);
+                    state.balances.eurc += received;
+                    saveTransaction({
+                        id: txHash,
+                        type: 'Conversion',
+                        amount: amt,
+                        token: 'USDC',
+                        status: 'Success',
+                        timestamp: Date.now()
+                    });
+                }
+
                 updateBalances();
-                const hash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
-                showFeedback(`Successfully sent ${amt} USDC to ${rcpt}!`, "success", hash);
-                elements.payAmount.value = "";
-                elements.recipient.value = "";
-            }, 1800);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                state.isProcessing = false;
+                input.value = "";
+                if (elements.recipient) elements.recipient.value = "";
+                handleAmountInput();
+
+                showToast(`Success! View on Explorer`, "success", `${ARCSCAN_ROOT}/tx/${txHash}`);
+            }, 2500);
+        }
+
+        function saveTransaction(tx) {
+            state.history.unshift(tx);
+            if (state.history.length > 5) state.history.pop();
+            localStorage.setItem('arcex_history', JSON.stringify(state.history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (state.history.length === 0) {
+                elements.historyList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.85rem;">No recent activity</div>`;
+                return;
+            }
+
+            elements.historyList.innerHTML = state.history.map(tx => `
+                <div class="tx-item" onclick="window.open('${ARCSCAN_ROOT}/tx/${tx.id}', '_blank')">
+                    <div class="tx-main">
+                        <div class="tx-icon">
+                            <i data-lucide="${tx.type === 'Payment' ? 'arrow-up-right' : 'refresh-cw'}" size="18"></i>
+                        </div>
+                        <div class="tx-info">
+                            <h5>${tx.type}</h5>
+                            <p>${new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • ${tx.status}</p>
+                        </div>
+                    </div>
+                    <div class="tx-amount">
+                        <span class="amt-val">${tx.type === 'Payment' ? '-' : ''}${tx.amount.toFixed(2)} ${tx.token}</span>
+                        <span class="tx-hash-short">${tx.id.substring(0,6)}...${tx.id.substring(36)}</span>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function clearHistory() {
+            state.history = [];
+            localStorage.removeItem('arcex_history');
+            renderHistory();
         }
 
         /**
-         * SWIPE GESTURE LOGIC
+         * NOTIFICATIONS
          */
-        let drag = {
-            active: false,
-            startX: 0,
-            x: 0,
-            limit: 0
-        };
-
-        elements.swipeHandle.addEventListener('mousedown', (e) => {
-            if (!state.wallet.connected) return;
-            startSwipe(e);
-        });
-        elements.swipeHandle.addEventListener('touchstart', (e) => {
-            if (!state.wallet.connected) return;
-            startSwipe(e.touches[0]);
-        });
-
-        window.addEventListener('mousemove', (e) => moveSwipe(e.clientX));
-        window.addEventListener('touchmove', (e) => moveSwipe(e.touches[0].clientX));
-
-        window.addEventListener('mouseup', endSwipe);
-        window.addEventListener('touchend', endSwipe);
-
-        function startSwipe(e) {
-            if (state.isProcessing) return;
-            drag.active = true;
-            drag.startX = e.clientX || e;
-            drag.limit = elements.swipeTrack.offsetWidth - elements.swipeHandle.offsetWidth - 12;
-            elements.swipeHandle.style.transition = "none";
-            elements.swipeProgress.style.transition = "none";
-        }
-
-        function moveSwipe(currentX) {
-            if (!drag.active) return;
-            let diff = currentX - drag.startX;
-            diff = Math.max(0, Math.min(diff, drag.limit));
-            drag.x = diff;
+        let toastTimeout;
+        function showToast(msg, type, clickUrl = null) {
+            clearTimeout(toastTimeout);
+            elements.toastMsg.textContent = msg;
+            elements.toast.className = `toast active ${type}`;
+            elements.toastIcon.innerHTML = type === 'success' ? '<i data-lucide="check" size="12"></i>' : (type === 'error' ? '<i data-lucide="alert-circle" size="12"></i>' : '<i data-lucide="info" size="12"></i>');
             
-            elements.swipeHandle.style.transform = `translateX(${diff}px)`;
-            elements.swipeProgress.style.width = `${(diff / drag.limit) * 100}%`;
-        }
-
-        function endSwipe() {
-            if (!drag.active) return;
-            drag.active = false;
-            
-            if (drag.x >= drag.limit * 0.95) {
-                executeConversion();
+            if (clickUrl) {
+                elements.toast.style.cursor = 'pointer';
+                elements.toast.onclick = () => window.open(clickUrl, '_blank');
             } else {
-                resetSwipe();
+                elements.toast.style.cursor = 'default';
+                elements.toast.onclick = null;
             }
+            
+            lucide.createIcons();
+
+            toastTimeout = setTimeout(() => {
+                elements.toast.classList.remove('active');
+            }, 4000);
         }
 
-        function resetSwipe() {
-            drag.x = 0;
-            elements.swipeHandle.style.transition = "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
-            elements.swipeProgress.style.transition = "width 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
-            elements.swipeHandle.style.transform = `translateX(0px)`;
-            elements.swipeProgress.style.width = `0%`;
-        }
-
-        function executeConversion() {
-            const amt = parseFloat(elements.swipeAmount.value) || 10;
-            if (amt > state.balances.usdc) {
-                showFeedback("Insufficient USDC balance.", "error");
-                resetSwipe();
-                return;
-            }
-
-            state.isProcessing = true;
-            elements.swipeHandle.innerHTML = `<div class="spinner" style="border-top-color: white;"></div>`;
-            hideFeedback();
-
-            setTimeout(() => {
-                const recv = amt * state.rate;
-                state.balances.usdc -= amt;
-                state.balances.eurc += recv;
-                state.isProcessing = false;
-                
-                elements.swipeHandle.innerHTML = `<i data-lucide="check" color="white" size="24"></i>`;
-                lucide.createIcons();
-                updateBalances();
-                const hash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
-                showFeedback(`Swapped ${amt} USDC for ${recv.toFixed(2)} EURC!`, "success", hash);
-                
-                setTimeout(() => {
-                    resetSwipe();
-                    elements.swipeHandle.innerHTML = `<i data-lucide="chevron-right" color="white" size="24"></i>`;
-                    lucide.createIcons();
-                }, 1500);
-            }, 1200);
-        }
-
-        /**
-         * FEEDBACK HELPERS
-         */
-        function showFeedback(msg, type, hash = null) {
-            elements.feedback.innerHTML = `<div>${msg}</div>`;
-            if (hash) {
-                elements.feedback.innerHTML += `
-                    <a href="https://testnet.arcscan.app/tx/${hash}" 
-                       target="_blank" 
-                       style="display: block; margin-top: 8px; font-size: 0.75rem; color: inherit; text-decoration: underline; opacity: 0.8; cursor: pointer;">
-                       View on ArcScan: ${hash.substring(0, 10)}...${hash.substring(58)}
-                    </a>`;
-            }
-            elements.feedback.className = `feedback ${type}`;
-        }
-
-        function hideFeedback() {
-            elements.feedback.className = `feedback`;
-        }
-
-        // Init layout
-        updateBalances();
-        updateConverted();
+        // Run App
+        initApp();
 
     </script>
 </body>
