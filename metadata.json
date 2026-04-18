@@ -1,6 +1,6 @@
 {
-  "name": "ARCEC Exchange",
-  "description": "A professional institutional asset hub and USDC payment gateway. Connect wallet, trade assets, and institutional-grade payments.",
+  "name": "ArcEX",
+  "description": "Institutional-grade stablecoin DEX and asset hub. Simplified asset management and high-velocity conversions on the ARC Network.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
