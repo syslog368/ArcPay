@@ -1251,6 +1251,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 Home
             </div>
+            <div class="sidebar-item" id="sidebarSwapBtn" onclick="switchView('swap')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Swap
+            </div>
             <div class="sidebar-item" id="settingsBtn" onclick="switchView('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Settings
@@ -1265,39 +1269,15 @@
             <!-- Tab Navigation -->
             <div class="mobile-view-tabs" id="navSwitcher">
                 <div class="tab active" onclick="switchView('send')">Home</div>
+                <div class="tab" id="mobileSwapTab" onclick="switchView('swap')">Swap</div>
                 <div class="tab" onclick="switchView('settings')">Settings</div>
             </div>
 
             <div class="view-container">
                 <!-- Send / Direct Pay -->
                 <section class="card" id="sendView">
-                    <div class="hero-section">
-                        <h1 class="hero-title">Institutional Asset <span class="text-gradient">Hub</span></h1>
-                        <p class="hero-subtitle">Premium direct blockchain execution specialized for high-fidelity asset management and settlements.</p>
-                        
-                        <div class="hero-metrics">
-                            <div class="metric-item">
-                                <span class="metric-value">33.2k</span>
-                                <span class="metric-label">Validator Nodes</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-value">$2.45B</span>
-                                <span class="metric-label">24h Volume</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-value">0.001s</span>
-                                <span class="metric-label">Finality</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <h2><span class="step-number">1</span>Send Payment</h2>
-                        <div style="font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2);">
-                            DIRECT NODE VERIFICATION
-                        </div>
-                    </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address on-chain.</p>
+                    <h2><span class="step-number">1</span>Send Payment</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Send USDC directly to any wallet address on-chain.</p>
                     
                     <div class="form-group">
                         <label for="directAddress">Recipient Address</label>
@@ -1330,8 +1310,44 @@
                 <div id="paymentView" class="hidden"></div>
                 <!-- Wallet / QR & History (Hidden, moved to Settings) -->
                 <div id="walletView" class="hidden"></div>
-                <!-- Swap View (Hidden, moved to Settings) -->
-                <div id="swapView" class="hidden"></div>
+                <!-- Swap View (Moved to Top Level) -->
+                <section class="card hidden" id="swapView">
+                    <h2>Swap Assets</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2.5rem;">De-centralized exchange between USDC and EURC on ARC Network.</p>
+                    
+                    <div class="swap-input-box">
+                        <span class="swap-label">Sell</span>
+                        <div class="swap-row">
+                            <input type="number" id="swapSellInput" class="swap-val" placeholder="0.00" value="0.00">
+                            <div class="token-pill"><span>USDC</span></div>
+                        </div>
+                    </div>
+                    <div class="percent-btns">
+                        <button class="pct-btn">25%</button>
+                        <button class="pct-btn">50%</button>
+                        <button class="pct-btn">75%</button>
+                        <button class="pct-btn">Max</button>
+                    </div>
+                    
+                    <div class="swap-divider">
+                        <div class="swap-arrow-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="swap-input-box">
+                        <span class="swap-label">Buy</span>
+                        <div class="swap-row">
+                            <input type="number" id="swapBuyInput" class="swap-val" placeholder="0.00" value="0.00" readonly>
+                            <div class="token-pill"><span>EURC</span></div>
+                        </div>
+                    </div>
+                    
+                    <button id="swapButton" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">
+                        Authorize Swap
+                    </button>
+                    <div id="swapTxStatus" style="margin-top: 1rem;"></div>
+                </section>
                 <!-- Profile View (Hidden, moved to Settings) -->
                 <div id="profileView" class="hidden"></div>
 
@@ -1344,7 +1360,6 @@
                         <button class="settings-tab active" onclick="showSettingsPane('general')">General</button>
                         <button class="settings-tab" onclick="showSettingsPane('wallet')">Wallet</button>
                         <button class="settings-tab" onclick="showSettingsPane('request')">Payment Links</button>
-                        <button class="settings-tab" onclick="showSettingsPane('swap')">Swap</button>
                         <button class="settings-tab" onclick="showSettingsPane('profile')">Account</button>
                     </div>
 
@@ -1432,33 +1447,6 @@
                             <button id="executePaymentBtn" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Authorize Payment</button>
                         </div>
                         <div id="txStatus"></div>
-                    </div>
-
-                    <!-- Swap Pane -->
-                    <div id="pane-swap" class="settings-pane hidden">
-                        <div class="swap-input-box">
-                            <span class="swap-label">Sell</span>
-                            <div class="swap-row">
-                                <input type="number" id="swapSellInput" class="swap-val" placeholder="0.00" value="0.00">
-                                <div class="token-pill"><span>USDC</span></div>
-                            </div>
-                        </div>
-                        <div class="percent-btns" style="display: flex; gap: 0.5rem; margin: 1rem 0;">
-                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">25%</button>
-                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">50%</button>
-                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">75%</button>
-                            <button class="pct-btn" style="flex: 1; padding: 0.5rem; background: var(--accent); border-radius: 8px; font-size: 0.8rem; font-weight: 700;">Max</button>
-                        </div>
-                        <div class="swap-divider" style="text-align: center; margin: 0.5rem 0; color: var(--text-muted);">↓</div>
-                        <div class="swap-input-box">
-                            <span class="swap-label">Buy</span>
-                            <div class="swap-row">
-                                <input type="number" id="swapBuyInput" class="swap-val" placeholder="0.00" value="0.00" readonly>
-                                <div class="token-pill"><span>EURC</span></div>
-                            </div>
-                        </div>
-                        <button id="swapButton" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">Swap</button>
-                        <div id="swapTxStatus"></div>
                     </div>
 
                     <!-- Account Pane -->
@@ -1959,21 +1947,29 @@
                 const home = document.getElementById('sidebarHomeBtn');
                 if (home) home.classList.add('active');
                 if (document.querySelectorAll('.tab')[0]) document.querySelectorAll('.tab')[0].classList.add('active');
+            } else if (view === 'swap') {
+                const swap = document.getElementById('sidebarSwapBtn');
+                if (swap) swap.classList.add('active');
+                const mTab = document.getElementById('mobileSwapTab');
+                if (mTab) mTab.classList.add('active');
             } else if (view === 'settings') {
                 const sett = document.getElementById('settingsBtn');
                 if (sett) sett.classList.add('active');
-                if (document.querySelectorAll('.tab')[1]) document.querySelectorAll('.tab')[1].classList.add('active');
+                const mTab = document.querySelectorAll('.tab')[2]; // Adjust index since we added a tab
+                if (mTab) mTab.classList.add('active');
             }
 
             // Toggle containers
             elements.sendView.classList.add('hidden');
+            elements.swapView.classList.add('hidden');
             elements.settingsView.classList.add('hidden');
 
             if (view === 'send') elements.sendView.classList.remove('hidden');
+            if (view === 'swap') elements.swapView.classList.remove('hidden');
             if (view === 'settings') elements.settingsView.classList.remove('hidden');
             
             // Refresh balance check if wallet/history is shown in settings
-            if (view === 'settings') updateBalance();
+            if (view === 'settings' || view === 'swap') updateBalance();
         }
 
         function showSettingsPane(paneId) {
