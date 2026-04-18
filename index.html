@@ -1255,6 +1255,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                 Swap
             </div>
+            <div class="sidebar-item" id="sidebarFundsBtn" onclick="switchView('funds')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Funds
+            </div>
             <div class="sidebar-item" id="settingsBtn" onclick="switchView('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Settings
@@ -1270,6 +1274,7 @@
             <div class="mobile-view-tabs" id="navSwitcher">
                 <div class="tab active" onclick="switchView('send')">Home</div>
                 <div class="tab" id="mobileSwapTab" onclick="switchView('swap')">Swap</div>
+                <div class="tab" id="mobileFundsTab" onclick="switchView('funds')">Funds</div>
                 <div class="tab" onclick="switchView('settings')">Settings</div>
             </div>
 
@@ -1310,8 +1315,48 @@
                 <div id="paymentView" class="hidden"></div>
                 <!-- Wallet / QR & History (Hidden, moved to Settings) -->
                 <div id="walletView" class="hidden"></div>
-                <!-- Swap View (Moved to Top Level) -->
-                <section class="card hidden" id="swapView">
+                <!-- Funds View (Deposit/Withdraw) -->
+                <section class="card hidden" id="fundsView">
+                    <h2>Manage Funds</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2rem;">Move assets into and out of your institutional vault.</p>
+
+                    <!-- Funds Internal Tabs -->
+                    <div class="settings-nav" style="margin-bottom: 2rem;">
+                        <button class="settings-tab active" id="fundTabDeposit" onclick="showFundsSubPane('deposit')">Deposit</button>
+                        <button class="settings-tab" id="fundTabWithdraw" onclick="showFundsSubPane('withdraw')">Withdraw</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Asset</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+                            <div class="token-pill asset-select active" data-asset="USDC" onclick="selectFundAsset(this)">
+                                <div class="token-icon" style="background: #2775ca;">U</div>
+                                <span>USDC</span>
+                            </div>
+                            <div class="token-pill asset-select" data-asset="EURC" onclick="selectFundAsset(this)">
+                                <div class="token-icon" style="background: #003399;">E</div>
+                                <span>EURC</span>
+                            </div>
+                            <div class="token-pill asset-select" data-asset="ARC" onclick="selectFundAsset(this)">
+                                <div class="token-icon" style="background: #f59e0b;">A</div>
+                                <span>ARC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <label style="margin-bottom: 0;">Amount</label>
+                            <span id="fundBalanceInfo" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Wallet: 0.00 USDC</span>
+                        </div>
+                        <div class="swap-input-box">
+                            <input type="number" id="fundAmount" class="swap-val" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <button id="fundActionBtn" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">Authorize Deposit</button>
+                    <div id="fundStatus" style="margin-top: 1rem;"></div>
+                </section>
                     <h2>Swap Assets</h2>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: -1.5rem; margin-bottom: 2.5rem;">De-centralized exchange between USDC and EURC on ARC Network.</p>
                     
@@ -1711,6 +1756,13 @@
             swapTxStatus: document.getElementById('swapTxStatus'),
             bridgeView: document.getElementById('bridgeView'),
             profileView: document.getElementById('profileView'),
+            fundsView: document.getElementById('fundsView'),
+            fundAmount: document.getElementById('fundAmount'),
+            fundActionBtn: document.getElementById('fundActionBtn'),
+            fundStatus: document.getElementById('fundStatus'),
+            fundBalanceInfo: document.getElementById('fundBalanceInfo'),
+            fundTabDeposit: document.getElementById('fundTabDeposit'),
+            fundTabWithdraw: document.getElementById('fundTabWithdraw'),
             headerProfileBtn: document.getElementById('headerProfileBtn'),
             profileAddress: document.getElementById('profileAddress'),
             profileNetwork: document.getElementById('profileNetwork'),
@@ -1952,38 +2004,140 @@
                 if (swap) swap.classList.add('active');
                 const mTab = document.getElementById('mobileSwapTab');
                 if (mTab) mTab.classList.add('active');
+            } else if (view === 'funds') {
+                const fundBtn = document.getElementById('sidebarFundsBtn');
+                if (fundBtn) fundBtn.classList.add('active');
+                const mTab = document.getElementById('mobileFundsTab');
+                if (mTab) mTab.classList.add('active');
             } else if (view === 'settings') {
                 const sett = document.getElementById('settingsBtn');
                 if (sett) sett.classList.add('active');
-                const mTab = document.querySelectorAll('.tab')[2]; // Adjust index since we added a tab
+                const mTab = document.querySelectorAll('.tab')[3]; // Adjust index since we added Funds
                 if (mTab) mTab.classList.add('active');
             }
 
             // Toggle containers
             elements.sendView.classList.add('hidden');
             elements.swapView.classList.add('hidden');
+            elements.fundsView.classList.add('hidden');
             elements.settingsView.classList.add('hidden');
 
             if (view === 'send') elements.sendView.classList.remove('hidden');
             if (view === 'swap') elements.swapView.classList.remove('hidden');
+            if (view === 'funds') elements.fundsView.classList.remove('hidden');
             if (view === 'settings') elements.settingsView.classList.remove('hidden');
             
-            // Refresh balance check if wallet/history is shown in settings
-            if (view === 'settings' || view === 'swap') updateBalance();
+            // Refresh balance check
+            if (view === 'settings' || view === 'swap' || view === 'funds') updateBalance();
+            if (view === 'funds') initFundsState();
         }
 
         function showSettingsPane(paneId) {
             // Update tabs
-            document.querySelectorAll('.settings-tab').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.settings-tab').forEach(btn => {
+                if (btn.id && btn.id.startsWith('fundTab')) return; // skip funds tabs
+                btn.classList.remove('active');
+            });
             const clickedBtn = event ? event.target : null;
-            if (clickedBtn) clickedBtn.classList.add('active');
+            if (clickedBtn && !clickedBtn.id.startsWith('fundTab')) clickedBtn.classList.add('active');
 
             // Toggle panes
             document.querySelectorAll('.settings-pane').forEach(p => p.classList.add('hidden'));
-            document.getElementById('pane-' + paneId).classList.remove('hidden');
+            const targetPane = document.getElementById(`pane-${paneId}`);
+            if (targetPane) targetPane.classList.remove('hidden');
 
             if (paneId === 'profile') updateProfileData();
         }
+
+        /**
+         * FUNDS MANAGEMENT
+         */
+        let currentFundAction = 'deposit';
+        let currentFundAsset = 'USDC';
+
+        function initFundsState() {
+            updateFundBalanceDisplay();
+        }
+
+        function showFundsSubPane(type) {
+            currentFundAction = type;
+            elements.fundTabDeposit.classList.toggle('active', type === 'deposit');
+            elements.fundTabWithdraw.classList.toggle('active', type === 'withdraw');
+            elements.fundActionBtn.textContent = `Authorize ${type === 'deposit' ? 'Deposit' : 'Withdrawal'}`;
+            updateFundBalanceDisplay();
+        }
+
+        function selectFundAsset(el) {
+            document.querySelectorAll('.asset-select').forEach(pill => pill.classList.remove('active'));
+            el.classList.add('active');
+            currentFundAsset = el.dataset.asset;
+            updateFundBalanceDisplay();
+        }
+
+        function updateFundBalanceDisplay() {
+            // Simulated balances for professional institutional feel
+            const walletBal = 125000.50;
+            const vaultBal = 4500.00;
+            if (currentFundAction === 'deposit') {
+                elements.fundBalanceInfo.textContent = `Wallet: ${walletBal.toLocaleString()} ${currentFundAsset}`;
+            } else {
+                elements.fundBalanceInfo.textContent = `Vault: ${vaultBal.toLocaleString()} ${currentFundAsset}`;
+            }
+        }
+
+        elements.fundActionBtn.addEventListener('click', async () => {
+            const amt = elements.fundAmount.value;
+            if (!amt || amt <= 0) {
+                alert("Please enter a valid institutional amount.");
+                return;
+            }
+
+            if (!account) {
+                openWalletModal();
+                return;
+            }
+
+            elements.fundStatus.innerHTML = `
+                <div class="status-msg loading">
+                    <div class="status-spinner"></div>
+                    <span>Processing Vault ${currentFundAction.charAt(0).toUpperCase() + currentFundAction.slice(1)}...</span>
+                </div>
+            `;
+            elements.fundActionBtn.disabled = true;
+
+            try {
+                // Simulate on-chain institutional settlement delay
+                await new Promise(r => setTimeout(r, 2000));
+                
+                elements.fundStatus.innerHTML = `
+                    <div class="status-msg success">
+                        <span>Vault Transaction Success: moved ${currentFundAction === 'deposit' ? 'to' : 'from'} institutional storage.</span>
+                    </div>
+                `;
+                
+                addTransaction({
+                    type: currentFundAction,
+                    asset: currentFundAsset,
+                    amount: amt,
+                    to: 'ARCEC Global Vault',
+                    hash: '0x' + Math.random().toString(16).substr(2, 64),
+                    timestamp: new Date().toISOString(),
+                    status: 'success'
+                });
+                
+                elements.fundAmount.value = "";
+                updateFundBalanceDisplay();
+                updateBalance();
+            } catch (err) {
+                elements.fundStatus.innerHTML = `
+                    <div class="status-msg error">
+                        <span>Vault execution failed. Please verify node connectivity.</span>
+                    </div>
+                `;
+            } finally {
+                elements.fundActionBtn.disabled = false;
+            }
+        });
 
         async function updateProfileData() {
             if (!provider) return;
