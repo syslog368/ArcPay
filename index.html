@@ -3,43 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArcEX | High-Velocity Stablecoin Hub</title>
-    <!-- ethers.js for Web3 logic -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <title>ArcEX | High-Velocity Mini</title>
     <!-- Lucide for polished icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050507;
-            --card-bg: rgba(15, 15, 18, 0.9);
-            --primary: #ffffff;
-            --primary-rgb: 255, 255, 255;
-            --accent: #15151a;
+            --bg: #0f111a;
+            --card-bg: #1a1d2e;
+            --primary: #5e5ce6;
+            --secondary: #bf5af2;
+            --accent: #2c2f48;
             --text: #ffffff;
-            --text-muted: #8e8e93;
+            --text-muted: #989fb3;
             --border: rgba(255, 255, 255, 0.08);
-            --success: #34d399;
-            --error: #f87171;
-            --warning: #fbbf24;
-            --info: #60a5fa;
-            --radius-lg: 28px;
-            --radius-md: 18px;
-            --radius-sm: 12px;
-            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --glass-blur: 32px;
+            --success: #32d74b;
+            --error: #ff453a;
+            --font: 'Plus Jakarta Sans', sans-serif;
+            --glow: rgba(94, 92, 230, 0.15);
         }
 
         @keyframes fadeInScale { 
-            from { opacity: 0; transform: translateY(10px) scale(0.98); } 
+            from { opacity: 0; transform: translateY(20px) scale(0.98); } 
             to { opacity: 1; transform: translateY(0) scale(1); } 
         }
+
         @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         * {
@@ -51,1154 +44,616 @@
         }
 
         body {
-            font-family: var(--font-sans);
+            font-family: var(--font);
             background-color: var(--bg);
             color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 24px;
+            overflow: hidden;
             background-image: 
-                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(15, 15, 18, 1) 0%, transparent 100%);
+                radial-gradient(circle at 10% 20%, rgba(94, 92, 230, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.1) 0%, transparent 40%);
         }
 
         .container {
             width: 100%;
-            max-width: 460px;
+            max-width: 420px;
+            position: relative;
             animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .dex-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 36px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 36px;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.05em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .controls-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .mode-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--accent);
-            padding: 8px 18px;
-            border-radius: 100px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .mode-toggle:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .switch {
-            width: 34px;
-            height: 20px;
-            background: #2c2c2e;
-            border-radius: 100px;
-            position: relative;
-            transition: background 0.3s;
-        }
-
-        .switch::after {
+        /* Gradient Glow behind card */
+        .container::before {
             content: '';
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(40px);
         }
 
-        .mode-toggle.active .switch {
-            background: var(--success);
-        }
-
-        .mode-toggle.active .switch::after {
-            transform: translateX(14px);
-        }
-
-        .smart-toggle-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 100px;
+        .card {
+            background: var(--card-bg);
             border: 1px solid var(--border);
-            transition: all 0.3s;
+            border-radius: 32px;
+            padding: 32px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
-        .smart-toggle-wrap.active {
-            color: var(--info);
-            border-color: var(--info);
-            background: rgba(96, 165, 250, 0.05);
-        }
-
-        .smart-toggle-wrap i {
-            transition: transform 0.3s;
-        }
-
-        .smart-toggle-wrap.active i {
-            transform: rotate(180deg);
-        }
-
-        .simple-tabs {
-            display: flex;
-            background: var(--accent);
-            padding: 5px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
-        }
-
-        .simple-tab {
-            flex: 1;
-            padding: 10px;
+        /* Header & Mode Switcher */
+        .header {
             text-align: center;
-            font-size: 0.8rem;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--accent);
+            padding: 4px;
+            border-radius: 100px;
+            position: relative;
+            margin: 0 auto 32px;
+            width: fit-content;
+            border: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 8px 24px;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .simple-tab.active {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .input-group {
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            margin-bottom: 12px;
+            border-radius: 100px;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
+            z-index: 2;
         }
 
-        .input-group:focus-within {
-            border-color: rgba(255, 255, 255, 0.2);
+        .tab.active {
+            color: var(--text);
+        }
+
+        .tab-indicator {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            width: calc(50% - 4px);
+            background: var(--primary);
+            border-radius: 100px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(94, 92, 230, 0.3);
+        }
+
+        .tabs.swipe-active .tab-indicator {
+            transform: translateX(100%);
+            background: var(--secondary);
+            box-shadow: 0 4px 12px rgba(191, 90, 242, 0.3);
+        }
+
+        /* Common Elements */
+        .input-box {
+            background: var(--accent);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--primary);
             background: rgba(255, 255, 255, 0.02);
-            transform: translateY(-2px);
         }
 
         .label-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .balance-tag {
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color 0.2s, transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .balance-tag:hover {
-            color: var(--primary);
-            transform: translateX(-2px);
-        }
-
-        .val-row {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        input {
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 1.75rem;
-            font-weight: 800;
-            width: 100%;
-            outline: none;
-            font-family: var(--font-mono);
-            letter-spacing: -0.02em;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.05);
-        }
-
-        .token-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.06);
-            padding: 10px 14px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            min-width: 110px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .token-img {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-        }
-
-        .fee-info {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .fee-accent {
-            color: var(--text);
-            font-weight: 700;
-            margin-left: 5px;
-        }
-
-        .smart-suggestion {
-            display: none;
-            margin-top: 12px;
-            padding: 10px 14px;
-            background: rgba(96, 165, 250, 0.08);
-            border-radius: 10px;
-            font-size: 0.75rem;
-            color: var(--info);
-            font-weight: 600;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .smart-suggestion.active { display: flex; }
-        .smart-suggestion:hover { transform: scale(1.02); }
-
-        .pct-grid {
-            display: flex;
-            gap: 10px;
-            margin: 16px 0 28px;
-        }
-
-        .btn-pill {
-            flex: 1;
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-pill:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .connector {
-            height: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 5;
-        }
-
-        .btn-swap-tokens {
-            width: 42px;
-            height: 42px;
-            background: var(--bg);
-            border: 4px solid var(--bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            color: var(--text-muted);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            outline: 4px solid var(--accent);
-        }
-
-        .btn-swap-tokens:hover {
-            transform: scale(1.15) rotate(180deg);
-            color: var(--primary);
-            outline-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .swipe-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 0;
-            perspective: 1200px;
-        }
-
-        .swipe-container.active { display: flex; }
-
-        .arcex-card {
-            width: 100%;
-            height: 220px;
-            background: linear-gradient(145deg, #15151a 0%, #050507 100%);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            cursor: grab;
-            transition: all 0.15s ease-out;
-            touch-action: none;
-            overflow: hidden;
-        }
-
-        .arcex-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 200%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            animation: shimmer 4s infinite linear;
-        }
-
-        .card-inner { text-align: center; position: relative; z-index: 2; }
-
-        .card-orb {
-            width: 56px;
-            height: 56px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
-        }
-
-        .hint-text {
-            margin-top: 20px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            font-weight: 800;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 20px;
-            border-radius: var(--radius-md);
-            font-size: 1.05rem;
-            font-weight: 800;
-            border: none;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            letter-spacing: -0.01em;
-        }
-
-        .btn-primary { background: var(--primary); color: var(--bg); }
-        .btn-warning { background: var(--warning); color: var(--bg); }
-        .btn-disabled { 
-            background: #15151a !important; 
-            color: #3a3a3c !important; 
-            cursor: not-allowed !important; 
-            opacity: 0.6; 
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        .share-link-wrapper {
-            margin-top: 16px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .btn-text {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 100px;
-            transition: all 0.3s;
-        }
-
-        .btn-text:hover {
-            color: var(--primary);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .status-box {
-            margin-top: 28px;
-            padding: 20px;
-            border-radius: 18px;
-            font-size: 0.9rem;
-            display: none;
-            line-height: 1.5;
-            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .status-box.info { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); display: block; }
-        .status-box.success { background: rgba(52, 211, 153, 0.1); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.2); display: block; }
-        .status-box.error { background: rgba(248, 113, 113, 0.1); color: var(--error); border: 1px solid rgba(248, 113, 113, 0.2); display: block; }
-
-        .tx-details {
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            opacity: 0.8;
-            cursor: pointer;
-        }
-
-        .tx-details:hover { opacity: 1; text-decoration: underline; }
-
-        .history-wrap { margin-top: 40px; }
-        .history-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .history-title {
-            font-size: 0.8rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .btn-clear {
             font-size: 0.7rem;
             font-weight: 700;
-            color: var(--error);
-            opacity: 0.6;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-
-        .btn-clear:hover { opacity: 1; }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .history-item:last-child { border-bottom: none; }
-
-        .item-info { display: flex; flex-direction: column; gap: 4px; }
-        .item-type { font-weight: 700; color: var(--text); }
-        .item-date { font-size: 0.7rem; color: var(--text-muted); }
-        .item-val { text-align: right; }
-        .val-total { font-weight: 700; color: var(--text); }
-        .val-status { 
-            font-size: 0.65rem; 
-            font-weight: 800; 
-            padding: 3px 10px; 
-            border-radius: 6px; 
-            background: rgba(255, 255, 255, 0.05); 
-            display: inline-block;
-            margin-top: 4px;
+            color: var(--text-muted);
             text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
         }
 
-        .wallet-connector {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 100;
+        .balance {
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .input-row {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: var(--accent);
-            padding: 10px 20px;
-            border-radius: 100px;
-            border: 1px solid var(--border);
-            font-size: 0.85rem;
-            font-weight: 700;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: #3a3a3c; }
-        .dot.online { background: var(--success); box-shadow: 0 0 15px var(--success); }
-        .dot.warning { background: var(--warning); box-shadow: 0 0 15px var(--warning); }
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1.25rem;
+            font-weight: 700;
+            outline: none;
+            font-family: inherit;
+        }
 
-        .loading-shimmer {
-            width: 22px;
-            height: 22px;
-            border: 2.5px solid rgba(255, 255, 255, 0.3);
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        .token-tag {
+            font-weight: 800;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Swipe Mode Styles */
+        .swipe-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .swipe-content.active {
+            display: flex;
+        }
+
+        .rate-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+
+        .swipe-track {
+            width: 100%;
+            height: 72px;
+            background: var(--accent);
+            border-radius: 100px;
+            position: relative;
+            padding: 6px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .swipe-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .swipe-handle {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            z-index: 3;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease-out;
+        }
+
+        .swipe-handle:active {
+            cursor: grabbing;
+        }
+
+        .swipe-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, transparent, rgba(191, 90, 242, 0.2));
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Action Button */
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 8px 24px rgba(94, 92, 230, 0.2);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .btn-main.sending {
+            background: var(--accent);
+            cursor: not-allowed;
+            color: var(--text-muted);
+            box-shadow: none;
+        }
+
+        /* Feedback Boxes */
+        .feedback {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .feedback.success { background: rgba(50, 215, 75, 0.1); color: var(--success); display: block; }
+        .feedback.error { background: rgba(255, 69, 58, 0.1); color: var(--error); display: block; }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 0.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .hidden { display: none !important; }
-
-        @media (max-width: 480px) {
-            .dex-card { padding: 28px; }
-            .wallet-connector { position: static; margin-bottom: 24px; width: fit-content; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="wallet-connector" id="walletConnector">
-        <div class="dot" id="netIndicator"></div>
-        <span id="displayAddress">Terminal Ready</span>
-    </div>
-
     <div class="container">
-        <div class="dex-card" id="mainSurface">
-            <header>
-                <div class="logo">
-                    <i data-lucide="zap" fill="white" size="28"></i>
-                    ArcEX
+        <div class="card">
+            <div class="header">
+                <h1>Send USDC</h1>
+                <div class="tabs" id="modeTabs">
+                    <div class="tab active" id="payTab">Pay</div>
+                    <div class="tab" id="swipeTab">Swipe</div>
+                    <div class="tab-indicator"></div>
                 </div>
-                <div class="controls-row">
-                    <div class="smart-toggle-wrap" id="smartToggle" onclick="toggleSmartMode()">
-                        <i data-lucide="command" size="14"></i>
-                        <span>Smart UX</span>
+            </div>
+
+            <!-- Pay Mode Content -->
+            <div id="payContent">
+                <div class="input-box">
+                    <div class="label-row">
+                        <span>Amount</span>
+                        <span class="balance" onclick="setMax()">Balance: <span id="usdcBal">1000</span> USDC</span>
                     </div>
-                    <div class="mode-toggle" id="globalModeToggle">
-                        <span id="modeLabel">Pro Terminal</span>
-                        <div class="switch"></div>
-                    </div>
-                </div>
-            </header>
-
-            <div id="simpleContext" class="simple-mode-desc hidden">
-                One-tap stablecoin operations. High-velocity routing is handled invisibly via the Smart UX engine.
-            </div>
-
-            <div class="simple-tabs hidden" id="subTabs">
-                <div class="simple-tab active" onclick="setSubTab('pay')">Pay</div>
-                <div class="simple-tab" onclick="setSubTab('convert')">Direct Swap</div>
-                <div class="simple-tab" onclick="setSubTab('swipe')">Swipe</div>
-            </div>
-
-            <div class="input-group hidden" id="peerInput">
-                <div class="label-row">
-                    <span>Recipient Destination</span>
-                    <span class="btn-text" style="padding: 0; opacity: 0.6;" onclick="pasteAddress()"><i data-lucide="clipboard" size="12"></i> Paste</span>
-                </div>
-                <div class="val-row">
-                    <input type="text" id="destination" placeholder="0x... or ENS" style="font-size: 1.1rem; font-family: var(--font-sans);">
-                </div>
-            </div>
-
-            <div class="input-group" id="sellPane">
-                <div class="label-row">
-                    <span id="sellRole">Asset to Send</span>
-                    <span class="balance-tag" onclick="useMax()"><i data-lucide="wallet" size="12"></i> <span id="usdcBalance">0.00</span></span>
-                </div>
-                <div class="val-row">
-                    <input type="number" id="amtSend" placeholder="0.00" oninput="recalcAmounts()">
-                    <div class="token-badge">
-                        <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-img" id="sellImg">
-                        <span id="sellSym">USDC</span>
+                    <div class="input-row">
+                        <input type="number" id="payAmount" placeholder="0.00">
+                        <span class="token-tag">USDC</span>
                     </div>
                 </div>
-                <div class="smart-suggestion" id="smartSug" onclick="applySuggestion()">
-                    <i data-lucide="sparkles" size="14"></i>
-                    <span id="smartSugText">Suggested: Add 1.20 USDC to optimize gas</span>
-                </div>
-                <div class="fee-info">
-                    Network Fee: <span class="fee-accent" id="gasFeeLabel">0.05 USDC</span>
-                </div>
-            </div>
 
-            <div class="pct-grid" id="pctGrid">
-                <button class="btn-pill" onclick="usePct(25)">25%</button>
-                <button class="btn-pill" onclick="usePct(50)">50%</button>
-                <button class="btn-pill" onclick="usePct(75)">75%</button>
-                <button class="btn-pill" onclick="useMax()">Max</button>
-            </div>
-
-            <div class="connector" id="swapConnector">
-                <div class="btn-swap-tokens" onclick="rotateAssets()">
-                    <i data-lucide="arrow-down-up" size="18"></i>
-                </div>
-            </div>
-
-            <div class="input-group" id="buyPane">
-                <div class="label-row">
-                    <span>Expected Receipt</span>
-                    <span class="balance-tag"><i data-lucide="vault" size="12"></i> <span id="eurcBalance">0.00</span></span>
-                </div>
-                <div class="val-row">
-                    <input type="number" id="amtRecv" placeholder="0.00" oninput="recalcAmounts()">
-                    <div class="token-badge">
-                        <img src="https://cryptologos.cc/logos/euro-coin-eurc-logo.png" class="token-img" id="buyImg">
-                        <span id="buySym">EURC</span>
+                <div class="input-box">
+                    <div class="label-row">
+                        <span>Recipient Address</span>
+                    </div>
+                    <div class="input-row">
+                        <input type="text" id="recipient" placeholder="0x... or name">
                     </div>
                 </div>
-            </div>
 
-            <div class="swipe-container" id="swipeSpace">
-                <div class="arcex-card" id="touchCard">
-                    <div class="card-inner">
-                        <div class="card-orb">
-                            <i data-lucide="box" size="28" color="white"></i>
-                        </div>
-                        <div class="swipe-card-title">Swipe to Execute</div>
-                        <div class="swipe-card-desc" id="swipeDescriptor">USDC → EURC</div>
-                    </div>
-                </div>
-                <div class="hint-text">
-                    <i data-lucide="chevron-left" size="14"></i>
-                    Secure Swipe
-                    <i data-lucide="chevron-right" size="14"></i>
-                </div>
-            </div>
-
-            <button class="btn-main btn-primary" id="mainAction" onclick="dispatchAction()">
-                Connect Infrastructure
-            </button>
-
-            <div class="share-link-wrapper hidden" id="shareWrap">
-                <button class="btn-text" onclick="copyPayLink()">
-                    <i data-lucide="share-2" size="14"></i> Generate Payment Link
+                <button class="btn-main" id="payBtn" onclick="handlePay()">
+                    <i data-lucide="send" size="18"></i>
+                    Send USDC
                 </button>
             </div>
 
-            <div id="statusReport" class="status-box"></div>
-
-            <div class="history-wrap">
-                <div class="history-top">
-                    <div class="history-title">On-Chain Activity</div>
-                    <div class="btn-clear" id="clearHistoryBtn" onclick="wipeLocalHistory()">Clear</div>
+            <!-- Swipe Mode Content -->
+            <div id="swipeContent" class="swipe-content">
+                <div class="rate-info">
+                    1 USDC ≈ 0.99 EURC
                 </div>
-                <div class="history-list" id="recentActivity">
-                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 20px;">
-                        No historical events found on-chain.
+                
+                <div class="input-box" style="width: 100%; margin-bottom: 24px;">
+                    <div class="label-row">
+                        <span>Converting</span>
+                        <span class="balance">Balance: <span id="swipeUsdcBal">1000</span> USDC</span>
+                    </div>
+                    <div class="input-row">
+                        <input type="number" id="swipeAmount" placeholder="10.00" oninput="updateConverted()">
+                        <span class="token-tag">USDC</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; text-align: left;">
+                        Receive: <span style="color: white; font-weight: 700;" id="convertedVal">9.90</span> EURC
                     </div>
                 </div>
+
+                <div class="swipe-track" id="swipeTrack">
+                    <div class="swipe-progress" id="swipeProgress"></div>
+                    <div class="swipe-text">Swipe to Convert</div>
+                    <div class="swipe-handle" id="swipeHandle">
+                        <i data-lucide="chevron-right" color="white" size="24"></i>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px; font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                    Your EURC Vault: <span style="color: white;" id="eurcBal">500</span> EURC
+                </div>
             </div>
+
+            <div id="feedback" class="feedback"></div>
         </div>
     </div>
 
     <script>
+        // Init Icons
         lucide.createIcons();
 
-        // Engine Configuration
-        const TARGET_CHAIN = "0xaa36a7"; // Sepolia
-        const ASSET_SPECS = {
-            USDC: { addr: "0x1c7D4B196Cb0232b3144efd80f94D600221276a2", dec: 6, logo: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png" },
-            EURC: { addr: "0x56CC5917457F85F96118D68393e9E308F1E496A6", dec: 6, logo: "https://cryptologos.cc/logos/euro-coin-eurc-logo.png" },
-            HUB: "0x456...789" // Arc Router
+        // App States
+        let state = {
+            mode: 'pay', // 'pay' or 'swipe'
+            balances: {
+                usdc: 1000.00,
+                eurc: 500.00
+            },
+            isProcessing: false,
+            rate: 0.99
         };
 
-        const CORE_ABI = [
-            "function balanceOf(address o) view returns (uint256)",
-            "function approve(address s, uint256 a) returns (bool)",
-            "function allowance(address o, address s) view returns (uint256)",
-            "function transfer(address t, uint256 a) returns (bool)"
-        ];
-
-        let engine = {
-            provider: null,
-            signer: null,
-            address: null,
-            balanceUSDC: 0,
-            balanceEURC: 0,
-            chainId: null,
-            isSimple: false,
-            isSmart: true,
-            currentTab: 'pay',
-            working: false,
-            history: [],
-            rate: 0.925, // Mock rate
-            gasFixed: 0.05
+        // DOM Elements
+        const elements = {
+            payTab: document.getElementById('payTab'),
+            swipeTab: document.getElementById('swipeTab'),
+            modeTabs: document.getElementById('modeTabs'),
+            payContent: document.getElementById('payContent'),
+            swipeContent: document.getElementById('swipeContent'),
+            usdcBal: document.getElementById('usdcBal'),
+            swipeUsdcBal: document.getElementById('swipeUsdcBal'),
+            eurcBal: document.getElementById('eurcBal'),
+            payAmount: document.getElementById('payAmount'),
+            recipient: document.getElementById('recipient'),
+            payBtn: document.getElementById('payBtn'),
+            feedback: document.getElementById('feedback'),
+            swipeAmount: document.getElementById('swipeAmount'),
+            convertedVal: document.getElementById('convertedVal'),
+            swipeHandle: document.getElementById('swipeHandle'),
+            swipeTrack: document.getElementById('swipeTrack'),
+            swipeProgress: document.getElementById('swipeProgress')
         };
 
-        const ui = {
-            displayAddress: document.getElementById('displayAddress'),
-            netIndicator: document.getElementById('netIndicator'),
-            mainAction: document.getElementById('mainAction'),
-            amtSend: document.getElementById('amtSend'),
-            amtRecv: document.getElementById('amtRecv'),
-            usdcBal: document.getElementById('usdcBalance'),
-            eurcBal: document.getElementById('eurcBalance'),
-            globalToggle: document.getElementById('globalModeToggle'),
-            buyPane: document.getElementById('buyPane'),
-            swapConnector: document.getElementById('swapConnector'),
-            pctGrid: document.getElementById('pctGrid'),
-            simpleContext: document.getElementById('simpleContext'),
-            subTabs: document.getElementById('subTabs'),
-            peerInput: document.getElementById('peerInput'),
-            destination: document.getElementById('destination'),
-            swipeSpace: document.getElementById('swipeSpace'),
-            touchCard: document.getElementById('touchCard'),
-            statusReport: document.getElementById('statusReport'),
-            historyList: document.getElementById('recentActivity'),
-            sellSym: document.getElementById('sellSym'),
-            buySym: document.getElementById('buySym'),
-            sellImg: document.getElementById('sellImg'),
-            buyImg: document.getElementById('buyImg'),
-            modeLabel: document.getElementById('modeLabel'),
-            sellPane: document.getElementById('sellPane'),
-            smartToggle: document.getElementById('smartToggle'),
-            smartSug: document.getElementById('smartSug'),
-            smartSugText: document.getElementById('smartSugText'),
-            shareWrap: document.getElementById('shareWrap')
-        };
+        /**
+         * MODE TOGGLE LOGIC
+         */
+        elements.payTab.addEventListener('click', () => switchMode('pay'));
+        elements.swipeTab.addEventListener('click', () => switchMode('swipe'));
 
-        // Initialize from URL and Cache
-        window.addEventListener('load', () => {
-            loadHistory();
-            checkUrlParams();
-            if (engine.isSmart) ui.smartToggle.classList.add('active');
-        });
-
-        function checkUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.has('amount') || params.has('recipient')) {
-                engine.isSimple = true;
-                engine.currentTab = 'pay';
-                ui.globalToggle.classList.add('active');
-                ui.modeLabel.textContent = "Pay Mode";
-                
-                if (params.has('amount')) ui.amtSend.value = params.get('amount');
-                if (params.has('recipient')) ui.destination.value = params.get('recipient');
-                
-                applyUILayout();
-                recalcAmounts();
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }
-
-        function toggleSmartMode() {
-            engine.isSmart = !engine.isSmart;
-            ui.smartToggle.classList.toggle('active', engine.isSmart);
-            recalcAmounts();
-        }
-
-        ui.globalToggle.addEventListener('click', () => {
-            if (!engine.isSimple) {
-                engine.isSimple = true;
-                engine.currentTab = 'pay';
-                ui.globalToggle.classList.add('active');
-                ui.modeLabel.textContent = "Pay Mode";
-            } else if (engine.currentTab === 'pay') {
-                engine.currentTab = 'convert';
-                ui.modeLabel.textContent = "Direct Swap";
-            } else {
-                engine.isSimple = false;
-                ui.globalToggle.classList.remove('active');
-                ui.modeLabel.textContent = "Pro Terminal";
-            }
-            applyUILayout();
-            updateButtonUI();
-        });
-
-        function applyUILayout() {
-            const simple = engine.isSimple;
-            ui.buyPane.classList.toggle('hidden', simple);
-            ui.swapConnector.classList.toggle('hidden', simple);
-            ui.pctGrid.classList.toggle('hidden', simple);
-            ui.simpleContext.classList.toggle('hidden', !simple);
-            ui.subTabs.classList.toggle('hidden', !simple);
-            ui.shareWrap.classList.toggle('hidden', !(simple && engine.currentTab === 'pay'));
+        function switchMode(mode) {
+            state.mode = mode;
+            elements.payTab.classList.toggle('active', mode === 'pay');
+            elements.swipeTab.classList.toggle('active', mode === 'swipe');
+            elements.modeTabs.classList.toggle('swipe-active', mode === 'swipe');
             
-            if (simple) {
-                setSubTab(engine.currentTab);
-            } else {
-                ui.peerInput.classList.remove('active', 'hidden');
-                ui.peerInput.classList.add('hidden');
-                ui.swipeSpace.classList.remove('active');
-                ui.swipeSpace.classList.add('hidden');
-                ui.sellPane.classList.remove('hidden');
-                ui.mainAction.classList.remove('hidden');
-            }
-        }
-
-        function setSubTab(tab) {
-            engine.currentTab = tab;
-            document.querySelectorAll('.simple-tab').forEach(t => {
-                const id = t.getAttribute('onclick').match(/'([^']+)'/)[1];
-                t.classList.toggle('active', id === tab);
-            });
-            ui.peerInput.classList.toggle('hidden', tab !== 'pay');
-            ui.swipeSpace.classList.toggle('hidden', tab !== 'swipe');
-            ui.swipeSpace.classList.toggle('active', tab === 'swipe');
+            elements.payContent.classList.toggle('hidden', mode !== 'pay');
+            elements.swipeContent.classList.toggle('active', mode === 'swipe');
             
-            if (tab === 'swipe') {
-                ui.sellPane.classList.add('hidden');
-                ui.mainAction.classList.add('hidden');
-            } else {
-                ui.sellPane.classList.remove('hidden');
-                ui.mainAction.classList.remove('hidden');
-            }
-            ui.amtSend.placeholder = tab === 'pay' ? "Amount to pay" : "Amount to convert";
-            ui.shareWrap.classList.toggle('hidden', tab !== 'pay');
-            updateButtonUI();
+            hideFeedback();
+            resetSwipe();
+            updateBalances();
         }
 
-        async function bootEngine() {
-            if (!window.ethereum) { report("MetaMask infrasture not detected.", "error"); return; }
-            try {
-                report("Initializing vault connection...", "info");
-                engine.provider = new ethers.BrowserProvider(window.ethereum);
-                const accs = await engine.provider.send("eth_requestAccounts", []);
-                engine.address = accs[0];
-                engine.signer = await engine.provider.getSigner();
-
-                const net = await engine.provider.getNetwork();
-                engine.chainId = "0x" + net.chainId.toString(16);
-
-                if (engine.chainId !== TARGET_CHAIN) await forceNetworkSwitch();
-
-                ui.displayAddress.textContent = engine.address.slice(0, 6) + "..." + engine.address.slice(-4);
-                ui.netIndicator.className = 'dot online';
-                hideReport();
-                await syncVault();
-                updateButtonUI();
-
-                window.ethereum.on('chainChanged', (cid) => { engine.chainId = cid; window.location.reload(); });
-                window.ethereum.on('accountsChanged', (accs) => { engine.address = accs[0]; window.location.reload(); });
-                
-                setInterval(syncVault, 8000);
-            } catch (err) { console.error(err); report("Vault access rejected or unavailable.", "error"); }
+        /**
+         * BALANCE UPDATE LOGIC
+         */
+        function updateBalances() {
+            elements.usdcBal.textContent = state.balances.usdc.toFixed(2);
+            elements.swipeUsdcBal.textContent = state.balances.usdc.toFixed(2);
+            elements.eurcBal.textContent = state.balances.eurc.toFixed(2);
         }
 
-        async function forceNetworkSwitch() {
-            try {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: TARGET_CHAIN }] });
-            } catch (err) { report(`Switch to Sepolia Network to continue.`, "error"); }
+        function setMax() {
+            elements.payAmount.value = state.balances.usdc;
         }
 
-        async function syncVault() {
-            if (!engine.address || !engine.provider) return;
-            try {
-                const uContract = new ethers.Contract(ASSET_SPECS.USDC.addr, CORE_ABI, engine.provider);
-                const eContract = new ethers.Contract(ASSET_SPECS.EURC.addr, CORE_ABI, engine.provider);
-                const [ub, eb] = await Promise.all([ uContract.balanceOf(engine.address), eContract.balanceOf(engine.address) ]);
-                engine.balanceUSDC = parseFloat(ethers.formatUnits(ub, 6));
-                engine.balanceEURC = parseFloat(ethers.formatUnits(eb, 6));
-                ui.usdcBal.textContent = engine.balanceUSDC.toLocaleString(undefined, {minimumFractionDigits: 2});
-                ui.eurcBal.textContent = engine.balanceEURC.toLocaleString(undefined, {minimumFractionDigits: 2});
-            } catch (err) { console.error("Vault sync error:", err); }
+        function updateConverted() {
+            const val = parseFloat(elements.swipeAmount.value) || 0;
+            elements.convertedVal.textContent = (val * state.rate).toFixed(2);
         }
 
-        function recalcAmounts() {
-            const sendVal = parseFloat(ui.amtSend.value);
-            if (isNaN(sendVal) || sendVal <= 0) { ui.amtRecv.value = ""; ui.smartSug.classList.remove('active'); return; }
+        /**
+         * PAY FEATURE LOGIC
+         */
+        async function handlePay() {
+            if (state.isProcessing) return;
             
-            // Smart UX logic - optimization suggestions
-            if (engine.isSmart) {
-                if (sendVal < 1) {
-                    ui.smartSugText.textContent = "Optimization: Increase to 1.00 USDC to minimize proportional fees";
-                    ui.smartSug.classList.add('active');
-                } else if (sendVal > engine.balanceUSDC && engine.balanceUSDC > 0) {
-                    ui.smartSugText.textContent = `Smart Balance: Adjusting to your max (${engine.balanceUSDC.toFixed(2)})`;
-                    ui.smartSug.classList.add('active');
-                } else {
-                    ui.smartSug.classList.remove('active');
-                }
-            } else {
-                ui.smartSug.classList.remove('active');
-            }
+            const amt = parseFloat(elements.payAmount.value);
+            const rcpt = elements.recipient.value.trim();
 
-            const net = Math.max(0, sendVal - engine.gasFixed);
-            ui.amtRecv.value = (net * engine.rate).toFixed(2);
-            updateButtonUI();
-        }
-
-        function applySuggestion() {
-            if (ui.smartSugText.textContent.includes("max")) {
-                ui.amtSend.value = engine.balanceUSDC.toFixed(2);
-            } else {
-                ui.amtSend.value = "1.00";
-            }
-            recalcAmounts();
-        }
-
-        function usePct(p) { ui.amtSend.value = (engine.balanceUSDC * (p/100)).toFixed(2); recalcAmounts(); }
-        function useMax() { ui.amtSend.value = engine.balanceUSDC.toFixed(2); recalcAmounts(); }
-
-        function rotateAssets() {
-            const sT = ui.sellSym.textContent;
-            const bT = ui.buySym.textContent;
-            const sI = ui.sellImg.src;
-            const bI = ui.buyImg.src;
-            ui.sellSym.textContent = bT; ui.buySym.textContent = sT;
-            ui.sellImg.src = bI; ui.buyImg.src = sI;
-            recalcAmounts();
-        }
-
-        async function dispatchAction() {
-            if (!engine.address) { await bootEngine(); return; }
-            if (engine.chainId !== TARGET_CHAIN) { await forceNetworkSwitch(); return; }
-            
-            if (engine.working) return;
-            if (engine.isSimple && engine.currentTab === 'pay') executePayment();
-            else executeSwapLogic();
-        }
-
-        async function executePayment() {
-            const amt = parseFloat(ui.amtSend.value);
-            const dst = ui.destination.value.trim();
-            if (!amt || amt <= 0) { report("Define a valid amount.", "error"); return; }
-            if (!dst || !ethers.isAddress(dst)) { report("Provide a valid destination address.", "error"); return; }
-
-            engine.working = true; updateButtonUI();
-            report("Broadcasting to Arc Network...", "info");
-
-            try {
-                const token = new ethers.Contract(ASSET_SPECS.USDC.addr, CORE_ABI, engine.signer);
-                const raw = ethers.parseUnits(amt.toString(), 6);
-                const tx = await token.transfer(dst, raw);
-                report("Transaction ongoing...", "info", tx.hash);
-                await tx.wait();
-                logHistory(`P2P Payment`, amt, "USDC", tx.hash);
-                report(`Dispatched ${amt} USDC to ${dst.slice(0,8)}...`, "success", tx.hash);
-                ui.amtSend.value = ""; ui.destination.value = "";
-                await syncVault();
-            } catch (err) { handleEngineError(err); }
-            finally { engine.working = false; updateButtonUI(); }
-        }
-
-        async function executeSwapLogic() {
-            const amt = parseFloat(ui.amtSend.value);
-            if (!amt || amt <= 0) { report("Define a valid conversion amount.", "error"); return; }
-            if (amt > engine.balanceUSDC) { report("Insufficient assets in vault.", "error"); return; }
-
-            engine.working = true; updateButtonUI();
-            try {
-                const token = new ethers.Contract(ASSET_SPECS.USDC.addr, CORE_ABI, engine.signer);
-                const raw = ethers.parseUnits(amt.toString(), 6);
-                
-                report("Verifying liquidity gate...", "info");
-                const gate = await token.allowance(engine.address, ASSET_SPECS.HUB);
-                if (gate < raw) {
-                    report("Opening liquidity channel...", "info");
-                    const gateTx = await token.approve(ASSET_SPECS.HUB, ethers.MaxUint256);
-                    await gateTx.wait();
-                }
-                
-                report("Finalizing high-velocity swap...", "info");
-                const tx = await token.transfer(ASSET_SPECS.HUB, raw);
-                report("Broadcasting confirmation...", "info", tx.hash);
-                await tx.wait();
-                logHistory(`Stable Swap`, amt, "USDC", tx.hash);
-                report(`Converted ${amt} USDC → ${ui.amtRecv.value} EURC`, "success", tx.hash);
-                ui.amtSend.value = ""; ui.amtRecv.value = "";
-                await syncVault();
-            } catch (err) { handleEngineError(err); }
-            finally { engine.working = false; updateButtonUI(); }
-        }
-
-        function handleEngineError(err) {
-            console.error(err);
-            if (err.code === 'ACTION_REJECTED') report("Operation terminated by user.", "error");
-            else if (err.message?.includes("insufficient funds")) report("Refill native gas for protocol fees.", "error");
-            else report("Core Engine Relay Error. Please retry.", "error");
-        }
-
-        function copyPayLink() {
-            const amt = ui.amtSend.value;
-            const rcpt = ui.destination.value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('amount', amt);
-            url.searchParams.set('recipient', rcpt);
-            navigator.clipboard.writeText(url.toString());
-            report("Payment link synchronized to clipboard.", "success");
-        }
-
-        function pasteAddress() {
-            navigator.clipboard.readText().then(text => {
-                if (ethers.isAddress(text)) ui.destination.value = text;
-            });
-        }
-
-        function logHistory(type, amt, sym, hash) {
-            const entry = { type, amt: amt.toFixed(2), sym, hash, date: new Date().toISOString() };
-            engine.history.unshift(entry);
-            saveHistory();
-            renderHistory();
-        }
-
-        function saveHistory() { localStorage.setItem('arcex_v1_history', JSON.stringify(engine.history.slice(0, 50))); }
-        function loadHistory() {
-            const raw = localStorage.getItem('arcex_v1_history');
-            if (raw) { engine.history = JSON.parse(raw); renderHistory(); }
-        }
-        function wipeLocalHistory() {
-            engine.history = [];
-            localStorage.removeItem('arcex_v1_history');
-            renderHistory();
-        }
-
-        function renderHistory() {
-            if (engine.history.length === 0) {
-                ui.historyList.innerHTML = `<div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 20px;">No historical events found on-chain.</div>`;
+            if (!amt || amt <= 0) {
+                showFeedback("Please enter a valid amount.", "error");
                 return;
             }
-            ui.historyList.innerHTML = engine.history.slice(0, 5).map(h => `
-                <div class="history-item">
-                    <div class="item-info">
-                        <span class="item-type">${h.type}</span>
-                        <span class="item-date">${new Date(h.date).toLocaleTimeString()} · ${new Date(h.date).toLocaleDateString()}</span>
-                    </div>
-                    <div class="item-val">
-                        <span class="val-total">${h.amt} ${h.sym}</span>
-                        <span class="val-status" onclick="window.open('https://etherscan.io/tx/${h.hash}')">Conf-ID: ${h.hash.slice(0,8)}</span>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function updateButtonUI() {
-            const btn = ui.mainAction;
-            if (!engine.address) { btn.textContent = "Connect Infrastructure"; return; }
-            if (engine.chainId !== TARGET_CHAIN) { btn.textContent = "Re-route to Sepolia"; btn.className = 'btn-main btn-warning'; return; }
-            btn.className = 'btn-main btn-primary';
-
-            if (engine.working) { btn.innerHTML = `<div class="loading-shimmer"></div> Optimizing...`; btn.classList.add('btn-disabled'); return; }
-
-            const a = parseFloat(ui.amtSend.value);
-            if (engine.isSimple && engine.currentTab === 'pay') {
-                if (!a || a <= 0) { btn.textContent = "Define Value"; btn.classList.add('btn-disabled'); return; }
-                if (!ethers.isAddress(ui.destination.value)) { btn.textContent = "Set Valid Target"; btn.classList.add('btn-disabled'); return; }
-                btn.textContent = "Initiate Payment";
-            } else {
-                if (!a || a <= 0) { btn.textContent = "Define Value"; btn.classList.add('btn-disabled'); return; }
-                if (a > engine.balanceUSDC) { btn.textContent = "Insufficient Liquidity"; btn.classList.add('btn-disabled'); return; }
-                btn.textContent = engine.isSimple ? "Instant Execution" : "Execute Pro Terminal Route";
+            if (amt > state.balances.usdc) {
+                showFeedback("Insufficient USDC balance.", "error");
+                return;
             }
-            btn.classList.remove('btn-disabled');
+            if (!rcpt) {
+                showFeedback("Please enter a recipient address.", "error");
+                return;
+            }
+
+            // Simulate sending
+            state.isProcessing = true;
+            elements.payBtn.innerHTML = `<div class="spinner"></div> Sending...`;
+            elements.payBtn.classList.add('sending');
+            hideFeedback();
+
+            setTimeout(() => {
+                state.balances.usdc -= amt;
+                state.isProcessing = false;
+                elements.payBtn.innerHTML = `<i data-lucide="send" size="18"></i> Send USDC`;
+                elements.payBtn.classList.remove('sending');
+                lucide.createIcons();
+                updateBalances();
+                const hash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                showFeedback(`Successfully sent ${amt} USDC to ${rcpt}!`, "success", hash);
+                elements.payAmount.value = "";
+                elements.recipient.value = "";
+            }, 1800);
         }
 
-        function report(m, t, h = null) {
-            ui.statusReport.innerHTML = m + (h ? `<div class="tx-details" onclick="window.open('https://etherscan.io/tx/${h}')"><i data-lucide='external-link' size='12'></i> Pulse-check blockchain transaction</div>` : "");
-            ui.statusReport.className = `status-box ${t}`;
-            ui.statusReport.style.display = 'block';
-            lucide.createIcons();
-        }
-        function hideReport() { ui.statusReport.style.display = 'none'; }
+        /**
+         * SWIPE GESTURE LOGIC
+         */
+        let drag = {
+            active: false,
+            startX: 0,
+            x: 0,
+            limit: 0
+        };
 
-        // Arc Swipe Logic
-        let drag = { on: false, sX: 0, cX: 0 };
-        ui.touchCard.addEventListener('mousedown', (e) => sDrag(e.clientX));
-        ui.touchCard.addEventListener('touchstart', (e) => sDrag(e.touches[0].clientX), { passive: true });
-        window.addEventListener('mousemove', (e) => mDrag(e.clientX));
-        window.addEventListener('touchmove', (e) => mDrag(e.touches[0].clientX), { passive: false });
-        window.addEventListener('mouseup', eDrag);
-        window.addEventListener('touchend', eDrag);
+        elements.swipeHandle.addEventListener('mousedown', startSwipe);
+        elements.swipeHandle.addEventListener('touchstart', (e) => startSwipe(e.touches[0]));
 
-        function sDrag(x) { 
-            if (!engine.address) { bootEngine(); return; }
-            drag.on = true; drag.sX = x; 
-            ui.touchCard.style.cursor = 'grabbing';
-            ui.touchCard.style.transition = 'none';
+        window.addEventListener('mousemove', (e) => moveSwipe(e.clientX));
+        window.addEventListener('touchmove', (e) => moveSwipe(e.touches[0].clientX));
+
+        window.addEventListener('mouseup', endSwipe);
+        window.addEventListener('touchend', endSwipe);
+
+        function startSwipe(e) {
+            if (state.isProcessing) return;
+            drag.active = true;
+            drag.startX = e.clientX || e;
+            drag.limit = elements.swipeTrack.offsetWidth - elements.swipeHandle.offsetWidth - 12;
+            elements.swipeHandle.style.transition = "none";
+            elements.swipeProgress.style.transition = "none";
         }
-        function mDrag(x) {
-            if (!drag.on) return;
-            drag.cX = x;
-            const d = drag.cX - drag.sX;
-            ui.touchCard.style.transform = `translateX(${d}px) rotate(${d/15}deg)`;
-            ui.touchCard.style.opacity = Math.abs(d) > 160 ? '0.6' : '1';
+
+        function moveSwipe(currentX) {
+            if (!drag.active) return;
+            let diff = currentX - drag.startX;
+            diff = Math.max(0, Math.min(diff, drag.limit));
+            drag.x = diff;
+            
+            elements.swipeHandle.style.transform = `translateX(${diff}px)`;
+            elements.swipeProgress.style.width = `${(diff / drag.limit) * 100}%`;
         }
-        async function eDrag() {
-            if (!drag.on) return;
-            drag.on = false;
-            ui.touchCard.style.cursor = 'grab';
-            ui.touchCard.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-            const d = drag.cX - drag.sX;
-            if (Math.abs(d) > 160) {
-                ui.touchCard.style.transform = `translateX(${d > 0 ? 800 : -800}px) rotate(${d/5}deg)`;
-                ui.touchCard.style.opacity = '0';
-                const v = engine.balanceUSDC * 0.1;
-                if (v > 0) { ui.amtSend.value = v.toFixed(2); executeSwapLogic(); }
+
+        function endSwipe() {
+            if (!drag.active) return;
+            drag.active = false;
+            
+            if (drag.x >= drag.limit * 0.95) {
+                executeConversion();
+            } else {
+                resetSwipe();
+            }
+        }
+
+        function resetSwipe() {
+            drag.x = 0;
+            elements.swipeHandle.style.transition = "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
+            elements.swipeProgress.style.transition = "width 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
+            elements.swipeHandle.style.transform = `translateX(0px)`;
+            elements.swipeProgress.style.width = `0%`;
+        }
+
+        function executeConversion() {
+            const amt = parseFloat(elements.swipeAmount.value) || 10;
+            if (amt > state.balances.usdc) {
+                showFeedback("Insufficient USDC balance.", "error");
+                resetSwipe();
+                return;
+            }
+
+            state.isProcessing = true;
+            elements.swipeHandle.innerHTML = `<div class="spinner" style="border-top-color: white;"></div>`;
+            hideFeedback();
+
+            setTimeout(() => {
+                const recv = amt * state.rate;
+                state.balances.usdc -= amt;
+                state.balances.eurc += recv;
+                state.isProcessing = false;
+                
+                elements.swipeHandle.innerHTML = `<i data-lucide="check" color="white" size="24"></i>`;
+                lucide.createIcons();
+                updateBalances();
+                showFeedback(`Swapped ${amt} USDC for ${recv.toFixed(2)} EURC!`, "success");
+                
                 setTimeout(() => {
-                    ui.touchCard.style.transition = 'none';
-                    ui.touchCard.style.transform = 'none';
-                    ui.touchCard.style.opacity = '1';
-                    setTimeout(() => ui.touchCard.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', 50);
-                }, 4000);
-            } else {
-                ui.touchCard.style.transform = 'none';
-                ui.touchCard.style.opacity = '1';
-            }
+                    resetSwipe();
+                    elements.swipeHandle.innerHTML = `<i data-lucide="chevron-right" color="white" size="24"></i>`;
+                    lucide.createIcons();
+                }, 1500);
+            }, 1200);
         }
+
+        /**
+         * FEEDBACK HELPERS
+         */
+        function showFeedback(msg, type, hash = null) {
+            elements.feedback.innerHTML = `<div>${msg}</div>`;
+            if (hash) {
+                elements.feedback.innerHTML += `
+                    <a href="https://testnet.arcscan.app/tx/${hash}" 
+                       target="_blank" 
+                       style="display: block; margin-top: 8px; font-size: 0.75rem; color: inherit; text-decoration: underline; opacity: 0.8; cursor: pointer;">
+                       View on ArcScan: ${hash.substring(0, 10)}...${hash.substring(60)}
+                    </a>`;
+            }
+            elements.feedback.className = `feedback ${type}`;
+        }
+
+        function hideFeedback() {
+            elements.feedback.className = `feedback`;
+        }
+
+        // Init layout
+        updateBalances();
+        updateConverted();
+
     </script>
 </body>
 </html>
