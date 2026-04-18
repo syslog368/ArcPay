@@ -3,27 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArcEX | Stablecoin DEX</title>
+    <title>ArcEX | High-Velocity Stablecoin Hub</title>
     <!-- ethers.js for Web3 logic -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <!-- Lucide for polished icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0c;
-            --card-bg: rgba(20, 20, 24, 0.8);
+            --bg: #050507;
+            --card-bg: rgba(15, 15, 18, 0.9);
             --primary: #ffffff;
             --primary-rgb: 255, 255, 255;
-            --accent: #1c1c21;
+            --accent: #15151a;
             --text: #ffffff;
             --text-muted: #8e8e93;
             --border: rgba(255, 255, 255, 0.08);
             --success: #34d399;
             --error: #f87171;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --font: 'Inter', system-ui, -apple-system, sans-serif;
-            --glass-blur: 24px;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+            --radius-lg: 28px;
+            --radius-md: 18px;
+            --radius-sm: 12px;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --glass-blur: 32px;
+        }
+
+        @keyframes fadeInScale { 
+            from { opacity: 0; transform: translateY(10px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
 
         * {
@@ -31,55 +47,63 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: var(--font);
+            font-family: var(--font-sans);
             background-color: var(--bg);
             color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(15, 15, 18, 1) 0%, transparent 100%);
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
-            padding: 20px;
-            perspective: 1000px;
+            max-width: 460px;
+            animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Card Section */
         .dex-card {
             background: var(--card-bg);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 32px;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 36px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 36px;
         }
 
         .logo {
-            font-size: 1.25rem;
+            font-size: 1.4rem;
             font-weight: 800;
-            letter-spacing: -0.04em;
+            letter-spacing: -0.05em;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
         .mode-toggle {
@@ -87,23 +111,24 @@
             align-items: center;
             gap: 12px;
             background: var(--accent);
-            padding: 6px 16px;
+            padding: 8px 18px;
             border-radius: 100px;
             font-weight: 600;
             font-size: 0.8rem;
             cursor: pointer;
             border: 1px solid var(--border);
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mode-toggle:hover {
             border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .switch {
-            width: 32px;
-            height: 18px;
-            background: #3a3a3c;
+            width: 34px;
+            height: 20px;
+            background: #2c2c2e;
             border-radius: 100px;
             position: relative;
             transition: background 0.3s;
@@ -114,11 +139,11 @@
             position: absolute;
             top: 2px;
             left: 2px;
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
-            transition: transform 0.3s;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mode-toggle.active .switch {
@@ -129,37 +154,103 @@
             transform: translateX(14px);
         }
 
-        /* Inputs */
-        .swap-input-container {
+        .smart-toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .smart-toggle-wrap.active {
+            color: var(--info);
+            border-color: var(--info);
+            background: rgba(96, 165, 250, 0.05);
+        }
+
+        .smart-toggle-wrap i {
+            transition: transform 0.3s;
+        }
+
+        .smart-toggle-wrap.active i {
+            transform: rotate(180deg);
+        }
+
+        .simple-tabs {
+            display: flex;
+            background: var(--accent);
+            padding: 5px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .simple-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .simple-tab.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
             background: var(--accent);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 20px;
-            margin-bottom: 8px;
-            transition: border-color 0.2s;
+            padding: 24px;
+            margin-bottom: 12px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
 
-        .swap-input-container:focus-within {
-            border-color: rgba(255, 255, 255, 0.15);
+        .input-group:focus-within {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateY(-2px);
         }
 
-        .input-header {
+        .label-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.75rem;
+            margin-bottom: 16px;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
         }
 
-        .balance {
+        .balance-tag {
             color: var(--text-muted);
             cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .input-row {
+        .balance-tag:hover {
+            color: var(--primary);
+            transform: translateX(-2px);
+        }
+
+        .val-row {
             display: flex;
             align-items: center;
             gap: 16px;
@@ -169,487 +260,494 @@
             background: transparent;
             border: none;
             color: var(--text);
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.75rem;
+            font-weight: 800;
             width: 100%;
             outline: none;
+            font-family: var(--font-mono);
+            letter-spacing: -0.02em;
         }
 
         input::placeholder {
-            color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.05);
         }
 
-        .token-select {
+        .token-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 12px;
-            border-radius: 12px;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 10px 14px;
+            border-radius: 14px;
             font-weight: 700;
-            font-size: 0.9rem;
-            min-width: 100px;
+            font-size: 0.95rem;
+            min-width: 110px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .token-icon {
-            width: 20px;
-            height: 20px;
+        .token-img {
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
         }
 
-        /* Percentage buttons */
-        .percentage-row {
+        .fee-info {
             display: flex;
-            gap: 8px;
-            margin: 12px 0 24px;
+            justify-content: flex-end;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .pct-btn {
+        .fee-accent {
+            color: var(--text);
+            font-weight: 700;
+            margin-left: 5px;
+        }
+
+        .smart-suggestion {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(96, 165, 250, 0.08);
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: var(--info);
+            font-weight: 600;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .smart-suggestion.active { display: flex; }
+        .smart-suggestion:hover { transform: scale(1.02); }
+
+        .pct-grid {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0 28px;
+        }
+
+        .btn-pill {
             flex: 1;
             background: var(--accent);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 0.7rem;
+            border-radius: 12px;
+            padding: 10px;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
 
-        .pct-btn:hover {
+        .btn-pill:hover {
             border-color: var(--primary);
             color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Divider */
-        .divider-container {
-            height: 12px;
+        .connector {
+            height: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            z-index: 2;
+            z-index: 5;
         }
 
-        .switch-tokens-btn {
-            width: 36px;
-            height: 36px;
-            background: var(--accent);
+        .btn-swap-tokens {
+            width: 42px;
+            height: 42px;
+            background: var(--bg);
             border: 4px solid var(--bg);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             color: var(--text-muted);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            outline: 4px solid var(--accent);
         }
 
-        .switch-tokens-btn:hover {
-            transform: scale(1.1) rotate(180deg);
-            color: var(--text);
+        .btn-swap-tokens:hover {
+            transform: scale(1.15) rotate(180deg);
+            color: var(--primary);
+            outline-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Simple Mode Adjustments */
-        .hidden {
-            display: none !important;
-        }
-
-        .simple-mode-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            line-height: 1.4;
-        }
-
-        /* Simple Mode Tabs */
-        .simple-tabs {
-            display: flex;
-            background: var(--accent);
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .simple-tab {
-            flex: 1;
-            padding: 8px;
-            text-align: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .simple-tab.active {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Pay Mode Input */
-        .recipient-container {
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 16px 20px;
-            margin-bottom: 8px;
-            display: none;
-        }
-
-        .recipient-container.active {
-            display: block;
-        }
-
-        .recipient-container input {
-            font-size: 0.95rem;
-            font-family: inherit;
-        }
-
-        /* Swipe Mode Styles */
-        .swipe-zone {
+        .swipe-container {
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: 20px 0;
-            perspective: 1000px;
+            padding: 30px 0;
+            perspective: 1200px;
         }
 
-        .swipe-zone.active {
-            display: flex;
-        }
+        .swipe-container.active { display: flex; }
 
-        .swipe-card {
+        .arcex-card {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #1c1c1e 0%, #0a0a0c 100%);
+            height: 220px;
+            background: linear-gradient(145deg, #15151a 0%, #050507 100%);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
             cursor: grab;
-            transition: transform 0.1s, opacity 0.3s;
+            transition: all 0.15s ease-out;
             touch-action: none;
+            overflow: hidden;
         }
 
-        .swipe-card-content {
-            text-align: center;
+        .arcex-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: shimmer 4s infinite linear;
         }
 
-        .swipe-card-icon {
-            width: 48px;
-            height: 48px;
+        .card-inner { text-align: center; position: relative; z-index: 2; }
+
+        .card-orb {
+            width: 56px;
+            height: 56px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
         }
 
-        .swipe-card-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-        }
-
-        .swipe-card-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .swipe-hint {
-            margin-top: 16px;
+        .hint-text {
+            margin-top: 20px;
             font-size: 0.7rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 700;
+            letter-spacing: 0.15em;
+            font-weight: 800;
         }
 
-        /* Buttons */
-        .btn {
+        .btn-main {
             width: 100%;
-            padding: 18px;
+            padding: 20px;
             border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1.05rem;
+            font-weight: 800;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 24px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 14px;
+            letter-spacing: -0.01em;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: var(--bg);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-disabled {
-            background: #1c1c1e !important;
-            color: #3a3a3c !important;
-            cursor: not-allowed !important;
+        .btn-primary { background: var(--primary); color: var(--bg); }
+        .btn-warning { background: var(--warning); color: var(--bg); }
+        .btn-disabled { 
+            background: #15151a !important; 
+            color: #3a3a3c !important; 
+            cursor: not-allowed !important; 
+            opacity: 0.6; 
             transform: none !important;
             box-shadow: none !important;
         }
 
-        /* Feedback */
-        .feedback {
-            margin-top: 24px;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 0.85rem;
-            display: none;
+        .share-link-wrapper {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
         }
 
-        .feedback.success {
-            background: rgba(52, 211, 153, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(52, 211, 153, 0.2);
-            display: block;
-        }
-
-        .feedback.error {
-            background: rgba(248, 113, 113, 0.1);
-            color: var(--error);
-            border: 1px solid rgba(248, 113, 113, 0.2);
-            display: block;
-        }
-
-        .tx-link {
-            color: inherit;
-            text-decoration: underline;
-            margin-top: 4px;
-            display: block;
-            opacity: 0.8;
-        }
-
-        /* Activity Section */
-        .activity-section {
-            margin-top: 32px;
-        }
-
-        .activity-header {
+        .btn-text {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
             font-size: 0.75rem;
             font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 100px;
+            transition: all 0.3s;
         }
 
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .btn-text:hover {
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
         }
+
+        .status-box {
+            margin-top: 28px;
+            padding: 20px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            display: none;
+            line-height: 1.5;
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .status-box.info { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); display: block; }
+        .status-box.success { background: rgba(52, 211, 153, 0.1); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.2); display: block; }
+        .status-box.error { background: rgba(248, 113, 113, 0.1); color: var(--error); border: 1px solid rgba(248, 113, 113, 0.2); display: block; }
+
+        .tx-details {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        .tx-details:hover { opacity: 1; text-decoration: underline; }
+
+        .history-wrap { margin-top: 40px; }
+        .history-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .btn-clear {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--error);
+            opacity: 0.6;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .btn-clear:hover { opacity: 1; }
 
         .history-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
         }
 
-        .history-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .history-item:last-child { border-bottom: none; }
+
+        .item-info { display: flex; flex-direction: column; gap: 4px; }
+        .item-type { font-weight: 700; color: var(--text); }
+        .item-date { font-size: 0.7rem; color: var(--text-muted); }
+        .item-val { text-align: right; }
+        .val-total { font-weight: 700; color: var(--text); }
+        .val-status { 
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            padding: 3px 10px; 
+            border-radius: 6px; 
+            background: rgba(255, 255, 255, 0.05); 
+            display: inline-block;
+            margin-top: 4px;
+            text-transform: uppercase;
         }
 
-        .history-val {
-            font-weight: 700;
-        }
-
-        .status-badge {
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 800;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* Wallet Section */
-        .wallet-info {
-            position: absolute;
+        .wallet-connector {
+            position: fixed;
             top: 24px;
             right: 24px;
+            z-index: 100;
             display: flex;
             align-items: center;
             gap: 12px;
             background: var(--accent);
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 100px;
             border: 1px solid var(--border);
             font-size: 0.85rem;
             font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #3a3a3c;
-        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #3a3a3c; }
+        .dot.online { background: var(--success); box-shadow: 0 0 15px var(--success); }
+        .dot.warning { background: var(--warning); box-shadow: 0 0 15px var(--warning); }
 
-        .indicator.online { background: var(--success); box-shadow: 0 0 10px var(--success); }
-
-        /* Spinner */
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+        .loading-shimmer {
+            width: 22px;
+            height: 22px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Responsive */
+        .hidden { display: none !important; }
+
         @media (max-width: 480px) {
-            .dex-card { padding: 24px; }
-            .wallet-info { position: static; margin-bottom: 24px; width: fit-content; }
+            .dex-card { padding: 28px; }
+            .wallet-connector { position: static; margin-bottom: 24px; width: fit-content; }
         }
     </style>
 </head>
 <body>
 
-    <div class="wallet-info" id="walletInfo">
-        <div class="indicator" id="statusIndicator"></div>
-        <span id="walletAddress">Not Connected</span>
+    <div class="wallet-connector" id="walletConnector">
+        <div class="dot" id="netIndicator"></div>
+        <span id="displayAddress">Terminal Ready</span>
     </div>
 
     <div class="container">
-        <div class="dex-card" id="mainCard">
+        <div class="dex-card" id="mainSurface">
             <header>
                 <div class="logo">
-                    <i data-lucide="zap" fill="white"></i>
+                    <i data-lucide="zap" fill="white" size="28"></i>
                     ArcEX
                 </div>
-                <div class="mode-toggle" id="modeToggle">
-                    <span id="modeToggleLabel">Simple Mode</span>
-                    <div class="switch"></div>
+                <div class="controls-row">
+                    <div class="smart-toggle-wrap" id="smartToggle" onclick="toggleSmartMode()">
+                        <i data-lucide="command" size="14"></i>
+                        <span>Smart UX</span>
+                    </div>
+                    <div class="mode-toggle" id="globalModeToggle">
+                        <span id="modeLabel">Pro Terminal</span>
+                        <div class="switch"></div>
+                    </div>
                 </div>
             </header>
 
-            <!-- Simple Mode Description (Conditional) -->
-            <div id="simpleDesc" class="simple-mode-desc hidden">
-                One-tap stablecoin operations. We handle liquidity and gas optimization automatically.
+            <div id="simpleContext" class="simple-mode-desc hidden">
+                One-tap stablecoin operations. High-velocity routing is handled invisibly via the Smart UX engine.
             </div>
 
-            <!-- Simple Mode Sub-Selector -->
-            <div class="simple-tabs hidden" id="simpleTabs">
-                <div class="simple-tab active" onclick="switchSimpleTab('pay')">Pay</div>
-                <div class="simple-tab" onclick="switchSimpleTab('convert')">Direct Swap</div>
-                <div class="simple-tab" onclick="switchSimpleTab('swipe')">Swipe</div>
+            <div class="simple-tabs hidden" id="subTabs">
+                <div class="simple-tab active" onclick="setSubTab('pay')">Pay</div>
+                <div class="simple-tab" onclick="setSubTab('convert')">Direct Swap</div>
+                <div class="simple-tab" onclick="setSubTab('swipe')">Swipe</div>
             </div>
 
-            <!-- Pay Mode Recipient -->
-            <div class="recipient-container" id="recipientContainer">
-                <div class="input-header">
-                    <span>Recipient</span>
+            <div class="input-group hidden" id="peerInput">
+                <div class="label-row">
+                    <span>Recipient Destination</span>
+                    <span class="btn-text" style="padding: 0; opacity: 0.6;" onclick="pasteAddress()"><i data-lucide="clipboard" size="12"></i> Paste</span>
                 </div>
-                <div class="input-row">
-                    <input type="text" id="recipientAddress" placeholder="0x... or ENS address">
+                <div class="val-row">
+                    <input type="text" id="destination" placeholder="0x... or ENS" style="font-size: 1.1rem; font-family: var(--font-sans);">
                 </div>
             </div>
 
-            <!-- Input Section 1: Sell -->
-            <div class="swap-input-container">
-                <div class="input-header">
-                    <span>You Sell</span>
-                    <span class="balance" id="usdcBalanceDisplay" onclick="setMax('sell')">Balance: 0.00</span>
+            <div class="input-group" id="sellPane">
+                <div class="label-row">
+                    <span id="sellRole">Asset to Send</span>
+                    <span class="balance-tag" onclick="useMax()"><i data-lucide="wallet" size="12"></i> <span id="usdcBalance">0.00</span></span>
                 </div>
-                <div class="input-row">
-                    <input type="number" id="sellAmount" placeholder="0.00" oninput="handleInput('sell')">
-                    <div class="token-select">
-                        <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-icon" id="sellIcon">
-                        <span id="sellSymbol">USDC</span>
+                <div class="val-row">
+                    <input type="number" id="amtSend" placeholder="0.00" oninput="recalcAmounts()">
+                    <div class="token-badge">
+                        <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="token-img" id="sellImg">
+                        <span id="sellSym">USDC</span>
+                    </div>
+                </div>
+                <div class="smart-suggestion" id="smartSug" onclick="applySuggestion()">
+                    <i data-lucide="sparkles" size="14"></i>
+                    <span id="smartSugText">Suggested: Add 1.20 USDC to optimize gas</span>
+                </div>
+                <div class="fee-info">
+                    Network Fee: <span class="fee-accent" id="gasFeeLabel">0.05 USDC</span>
+                </div>
+            </div>
+
+            <div class="pct-grid" id="pctGrid">
+                <button class="btn-pill" onclick="usePct(25)">25%</button>
+                <button class="btn-pill" onclick="usePct(50)">50%</button>
+                <button class="btn-pill" onclick="usePct(75)">75%</button>
+                <button class="btn-pill" onclick="useMax()">Max</button>
+            </div>
+
+            <div class="connector" id="swapConnector">
+                <div class="btn-swap-tokens" onclick="rotateAssets()">
+                    <i data-lucide="arrow-down-up" size="18"></i>
+                </div>
+            </div>
+
+            <div class="input-group" id="buyPane">
+                <div class="label-row">
+                    <span>Expected Receipt</span>
+                    <span class="balance-tag"><i data-lucide="vault" size="12"></i> <span id="eurcBalance">0.00</span></span>
+                </div>
+                <div class="val-row">
+                    <input type="number" id="amtRecv" placeholder="0.00" oninput="recalcAmounts()">
+                    <div class="token-badge">
+                        <img src="https://cryptologos.cc/logos/euro-coin-eurc-logo.png" class="token-img" id="buyImg">
+                        <span id="buySym">EURC</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Percentage Shortcuts (Hidden in Simple Mode) -->
-            <div class="percentage-row" id="pctRow">
-                <button class="pct-btn" onclick="setPct(25)">25%</button>
-                <button class="pct-btn" onclick="setPct(50)">50%</button>
-                <button class="pct-btn" onclick="setPct(75)">75%</button>
-                <button class="pct-btn" onclick="setMax('sell')">Max</button>
-            </div>
-
-            <!-- Divider / Switch Tokens -->
-            <div class="divider-container" id="switchDivider">
-                <div class="switch-tokens-btn" onclick="switchTokens()">
-                    <i data-lucide="arrow-down-up" size="16"></i>
-                </div>
-            </div>
-
-            <!-- Input Section 2: Buy (Hidden in Simple Mode) -->
-            <div class="swap-input-container" id="buyContainer">
-                <div class="input-header">
-                    <span>You Buy</span>
-                    <span class="balance" id="eurcBalanceDisplay">Balance: 0.00</span>
-                </div>
-                <div class="input-row">
-                    <input type="number" id="buyAmount" placeholder="0.00" oninput="handleInput('buy')">
-                    <div class="token-select">
-                        <img src="https://cryptologos.cc/logos/euro-coin-eurc-logo.png" class="token-icon" id="buyIcon">
-                        <span id="buySymbol">EURC</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Swipe Mode container -->
-            <div class="swipe-zone" id="swipeZone">
-                <div class="swipe-card" id="swipeCard">
-                    <div class="swipe-card-content">
-                        <div class="swipe-card-icon">
-                            <i data-lucide="zap" size="24" color="white"></i>
+            <div class="swipe-container" id="swipeSpace">
+                <div class="arcex-card" id="touchCard">
+                    <div class="card-inner">
+                        <div class="card-orb">
+                            <i data-lucide="box" size="28" color="white"></i>
                         </div>
-                        <div class="swipe-card-title">Swipe to Convert</div>
-                        <div class="swipe-card-desc">USDC to EURC</div>
+                        <div class="swipe-card-title">Swipe to Execute</div>
+                        <div class="swipe-card-desc" id="swipeDescriptor">USDC → EURC</div>
                     </div>
                 </div>
-                <div class="swipe-hint">
+                <div class="hint-text">
                     <i data-lucide="chevron-left" size="14"></i>
-                    Drag to Execute
+                    Secure Swipe
                     <i data-lucide="chevron-right" size="14"></i>
                 </div>
             </div>
 
-            <button class="btn btn-primary" id="actionBtn" onclick="handleAction()">
-                Connect Wallet
+            <button class="btn-main btn-primary" id="mainAction" onclick="dispatchAction()">
+                Connect Infrastructure
             </button>
 
-            <!-- Feedback Notifications -->
-            <div id="feedback" class="feedback"></div>
+            <div class="share-link-wrapper hidden" id="shareWrap">
+                <button class="btn-text" onclick="copyPayLink()">
+                    <i data-lucide="share-2" size="14"></i> Generate Payment Link
+                </button>
+            </div>
 
-            <!-- Activity / History -->
-            <div class="activity-section">
-                <div class="activity-header">Recent Activity</div>
-                <div class="history-list" id="historyList">
-                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 12px;">
-                        No history yet
+            <div id="statusReport" class="status-box"></div>
+
+            <div class="history-wrap">
+                <div class="history-top">
+                    <div class="history-title">On-Chain Activity</div>
+                    <div class="btn-clear" id="clearHistoryBtn" onclick="wipeLocalHistory()">Clear</div>
+                </div>
+                <div class="history-list" id="recentActivity">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 20px;">
+                        No historical events found on-chain.
                     </div>
                 </div>
             </div>
@@ -657,530 +755,450 @@
     </div>
 
     <script>
-        /**
-         * INITIALIZATION & CONFIG
-         */
         lucide.createIcons();
 
-        // Placeholder contract addresses (e.g. Sepolia or Mainnet)
-        const CONTRACTS = {
-            USDC: "0x1c7D4B196Cb0232b3144efd80f94D600221276a2", // Decimals: 6
-            EURC: "0x56CC5917457F85F96118D68393e9E308F1E496A6", // Decimals: 6
-            DEX_ROUTER: "0x456...789" // Placeholder for Arc Router
+        // Engine Configuration
+        const TARGET_CHAIN = "0xaa36a7"; // Sepolia
+        const ASSET_SPECS = {
+            USDC: { addr: "0x1c7D4B196Cb0232b3144efd80f94D600221276a2", dec: 6, logo: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png" },
+            EURC: { addr: "0x56CC5917457F85F96118D68393e9E308F1E496A6", dec: 6, logo: "https://cryptologos.cc/logos/euro-coin-eurc-logo.png" },
+            HUB: "0x456...789" // Arc Router
         };
 
-        const ERC20_ABI = [
-            "function balanceOf(address owner) view returns (uint256)",
-            "function decimals() view returns (uint8)",
-            "function approve(address spender, uint256 amount) returns (bool)",
-            "function allowance(address owner, address spender) view returns (uint256)",
-            "function transfer(address to, uint256 amount) returns (bool)"
+        const CORE_ABI = [
+            "function balanceOf(address o) view returns (uint256)",
+            "function approve(address s, uint256 a) returns (bool)",
+            "function allowance(address o, address s) view returns (uint256)",
+            "function transfer(address t, uint256 a) returns (bool)"
         ];
 
-        let state = {
+        let engine = {
             provider: null,
             signer: null,
             address: null,
-            balanceUSDC: "0.00",
-            balanceEURC: "0.00",
-            isSimpleMode: false,
-            simpleTab: 'pay', // Updated default to 'pay' as requested
-            sellToken: 'USDC',
-            buyToken: 'EURC',
-            isProcessing: false,
-            history: []
+            balanceUSDC: 0,
+            balanceEURC: 0,
+            chainId: null,
+            isSimple: false,
+            isSmart: true,
+            currentTab: 'pay',
+            working: false,
+            history: [],
+            rate: 0.925, // Mock rate
+            gasFixed: 0.05
         };
 
-        /**
-         * UI CONTROLS
-         */
-        const elements = {
-            walletAddress: document.getElementById('walletAddress'),
-            statusIndicator: document.getElementById('statusIndicator'),
-            actionBtn: document.getElementById('actionBtn'),
-            sellAmount: document.getElementById('sellAmount'),
-            buyAmount: document.getElementById('buyAmount'),
-            usdcBal: document.getElementById('usdcBalanceDisplay'),
-            eurcBal: document.getElementById('eurcBalanceDisplay'),
-            modeToggle: document.getElementById('modeToggle'),
-            buyContainer: document.getElementById('buyContainer'),
-            switchDivider: document.getElementById('switchDivider'),
-            pctRow: document.getElementById('pctRow'),
-            simpleDesc: document.getElementById('simpleDesc'),
-            simpleTabs: document.getElementById('simpleTabs'),
-            recipientContainer: document.getElementById('recipientContainer'),
-            recipientAddress: document.getElementById('recipientAddress'),
-            swipeZone: document.getElementById('swipeZone'),
-            swipeCard: document.getElementById('swipeCard'),
-            feedback: document.getElementById('feedback'),
-            historyList: document.getElementById('historyList'),
-            sellSymbol: document.getElementById('sellSymbol'),
-            buySymbol: document.getElementById('buySymbol'),
-            sellIcon: document.getElementById('sellIcon'),
-            buyIcon: document.getElementById('buyIcon')
+        const ui = {
+            displayAddress: document.getElementById('displayAddress'),
+            netIndicator: document.getElementById('netIndicator'),
+            mainAction: document.getElementById('mainAction'),
+            amtSend: document.getElementById('amtSend'),
+            amtRecv: document.getElementById('amtRecv'),
+            usdcBal: document.getElementById('usdcBalance'),
+            eurcBal: document.getElementById('eurcBalance'),
+            globalToggle: document.getElementById('globalModeToggle'),
+            buyPane: document.getElementById('buyPane'),
+            swapConnector: document.getElementById('swapConnector'),
+            pctGrid: document.getElementById('pctGrid'),
+            simpleContext: document.getElementById('simpleContext'),
+            subTabs: document.getElementById('subTabs'),
+            peerInput: document.getElementById('peerInput'),
+            destination: document.getElementById('destination'),
+            swipeSpace: document.getElementById('swipeSpace'),
+            touchCard: document.getElementById('touchCard'),
+            statusReport: document.getElementById('statusReport'),
+            historyList: document.getElementById('recentActivity'),
+            sellSym: document.getElementById('sellSym'),
+            buySym: document.getElementById('buySym'),
+            sellImg: document.getElementById('sellImg'),
+            buyImg: document.getElementById('buyImg'),
+            modeLabel: document.getElementById('modeLabel'),
+            sellPane: document.getElementById('sellPane'),
+            smartToggle: document.getElementById('smartToggle'),
+            smartSug: document.getElementById('smartSug'),
+            smartSugText: document.getElementById('smartSugText'),
+            shareWrap: document.getElementById('shareWrap')
         };
 
-        // Mode Toggle Logic
-        elements.modeToggle.addEventListener('click', () => {
-            const modeLabel = document.getElementById('modeToggleLabel');
-            
-            // Logic: Institutional Pro -> Pay Mode -> Direct Swap -> Institutional Pro
-            if (!state.isSimpleMode) {
-                // To Pay Mode (First Position)
-                state.isSimpleMode = true;
-                state.simpleTab = 'pay';
-                elements.modeToggle.classList.add('active');
-                modeLabel.textContent = "Pay Mode";
-            } else if (state.simpleTab === 'pay') {
-                // To Direct Swap (Second Position)
-                state.simpleTab = 'convert';
-                modeLabel.textContent = "Direct Swap";
-            } else {
-                // To Institutional Pro (Third / Defaults to Advanced)
-                state.isSimpleMode = false;
-                elements.modeToggle.classList.remove('active');
-                modeLabel.textContent = "Institutional Pro";
-            }
-            
-            // Apply visibility logic based on final state
-            if (state.isSimpleMode) {
-                elements.buyContainer.classList.add('hidden');
-                elements.switchDivider.classList.add('hidden');
-                elements.pctRow.classList.add('hidden');
-                elements.simpleDesc.classList.remove('hidden');
-                elements.simpleTabs.classList.remove('hidden');
-                switchSimpleTab(state.simpleTab);
-            } else {
-                elements.buyContainer.classList.remove('hidden');
-                elements.switchDivider.classList.remove('hidden');
-                elements.pctRow.classList.remove('hidden');
-                elements.simpleDesc.classList.add('hidden');
-                elements.simpleTabs.classList.add('hidden');
-                elements.recipientContainer.classList.remove('active');
-                elements.swipeZone.classList.remove('active');
-                document.querySelector('.swap-input-container').classList.remove('hidden');
-                elements.sellAmount.placeholder = "0.00";
-            }
-            updateBtnState();
+        // Initialize from URL and Cache
+        window.addEventListener('load', () => {
+            loadHistory();
+            checkUrlParams();
+            if (engine.isSmart) ui.smartToggle.classList.add('active');
         });
 
-        function switchSimpleTab(tab) {
-            state.simpleTab = tab;
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('amount') || params.has('recipient')) {
+                engine.isSimple = true;
+                engine.currentTab = 'pay';
+                ui.globalToggle.classList.add('active');
+                ui.modeLabel.textContent = "Pay Mode";
+                
+                if (params.has('amount')) ui.amtSend.value = params.get('amount');
+                if (params.has('recipient')) ui.destination.value = params.get('recipient');
+                
+                applyUILayout();
+                recalcAmounts();
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function toggleSmartMode() {
+            engine.isSmart = !engine.isSmart;
+            ui.smartToggle.classList.toggle('active', engine.isSmart);
+            recalcAmounts();
+        }
+
+        ui.globalToggle.addEventListener('click', () => {
+            if (!engine.isSimple) {
+                engine.isSimple = true;
+                engine.currentTab = 'pay';
+                ui.globalToggle.classList.add('active');
+                ui.modeLabel.textContent = "Pay Mode";
+            } else if (engine.currentTab === 'pay') {
+                engine.currentTab = 'convert';
+                ui.modeLabel.textContent = "Direct Swap";
+            } else {
+                engine.isSimple = false;
+                ui.globalToggle.classList.remove('active');
+                ui.modeLabel.textContent = "Pro Terminal";
+            }
+            applyUILayout();
+            updateButtonUI();
+        });
+
+        function applyUILayout() {
+            const simple = engine.isSimple;
+            ui.buyPane.classList.toggle('hidden', simple);
+            ui.swapConnector.classList.toggle('hidden', simple);
+            ui.pctGrid.classList.toggle('hidden', simple);
+            ui.simpleContext.classList.toggle('hidden', !simple);
+            ui.subTabs.classList.toggle('hidden', !simple);
+            ui.shareWrap.classList.toggle('hidden', !(simple && engine.currentTab === 'pay'));
             
-            // Update Tab UI
+            if (simple) {
+                setSubTab(engine.currentTab);
+            } else {
+                ui.peerInput.classList.remove('active', 'hidden');
+                ui.peerInput.classList.add('hidden');
+                ui.swipeSpace.classList.remove('active');
+                ui.swipeSpace.classList.add('hidden');
+                ui.sellPane.classList.remove('hidden');
+                ui.mainAction.classList.remove('hidden');
+            }
+        }
+
+        function setSubTab(tab) {
+            engine.currentTab = tab;
             document.querySelectorAll('.simple-tab').forEach(t => {
-                const tabId = t.getAttribute('onclick').match(/'([^']+)'/)[1];
-                t.classList.toggle('active', tabId === tab);
+                const id = t.getAttribute('onclick').match(/'([^']+)'/)[1];
+                t.classList.toggle('active', id === tab);
             });
-
-            // Toggle Content
-            elements.recipientContainer.classList.toggle('active', tab === 'pay');
-            elements.swipeZone.classList.toggle('active', tab === 'swipe');
+            ui.peerInput.classList.toggle('hidden', tab !== 'pay');
+            ui.swipeSpace.classList.toggle('hidden', tab !== 'swipe');
+            ui.swipeSpace.classList.toggle('active', tab === 'swipe');
             
-            // Input container visibility
-            const inputBlock = document.querySelector('.swap-input-container');
             if (tab === 'swipe') {
-                inputBlock.classList.add('hidden');
-                elements.actionBtn.classList.add('hidden');
+                ui.sellPane.classList.add('hidden');
+                ui.mainAction.classList.add('hidden');
             } else {
-                inputBlock.classList.remove('hidden');
-                elements.actionBtn.classList.remove('hidden');
+                ui.sellPane.classList.remove('hidden');
+                ui.mainAction.classList.remove('hidden');
             }
-
-            // Text changes
-            if (tab === 'pay') {
-                elements.sellAmount.placeholder = "Amount to pay";
-            } else {
-                elements.sellAmount.placeholder = "Amount to convert";
-            }
-            updateBtnState();
+            ui.amtSend.placeholder = tab === 'pay' ? "Amount to pay" : "Amount to convert";
+            ui.shareWrap.classList.toggle('hidden', tab !== 'pay');
+            updateButtonUI();
         }
 
-        /**
-         * WEB3 LOGIC
-         */
-        async function connectWallet() {
-            if (!window.ethereum) {
-                showFeedback("MetaMask not found. Please install it.", "error");
-                return;
+        async function bootEngine() {
+            if (!window.ethereum) { report("MetaMask infrasture not detected.", "error"); return; }
+            try {
+                report("Initializing vault connection...", "info");
+                engine.provider = new ethers.BrowserProvider(window.ethereum);
+                const accs = await engine.provider.send("eth_requestAccounts", []);
+                engine.address = accs[0];
+                engine.signer = await engine.provider.getSigner();
+
+                const net = await engine.provider.getNetwork();
+                engine.chainId = "0x" + net.chainId.toString(16);
+
+                if (engine.chainId !== TARGET_CHAIN) await forceNetworkSwitch();
+
+                ui.displayAddress.textContent = engine.address.slice(0, 6) + "..." + engine.address.slice(-4);
+                ui.netIndicator.className = 'dot online';
+                hideReport();
+                await syncVault();
+                updateButtonUI();
+
+                window.ethereum.on('chainChanged', (cid) => { engine.chainId = cid; window.location.reload(); });
+                window.ethereum.on('accountsChanged', (accs) => { engine.address = accs[0]; window.location.reload(); });
+                
+                setInterval(syncVault, 8000);
+            } catch (err) { console.error(err); report("Vault access rejected or unavailable.", "error"); }
+        }
+
+        async function forceNetworkSwitch() {
+            try {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: TARGET_CHAIN }] });
+            } catch (err) { report(`Switch to Sepolia Network to continue.`, "error"); }
+        }
+
+        async function syncVault() {
+            if (!engine.address || !engine.provider) return;
+            try {
+                const uContract = new ethers.Contract(ASSET_SPECS.USDC.addr, CORE_ABI, engine.provider);
+                const eContract = new ethers.Contract(ASSET_SPECS.EURC.addr, CORE_ABI, engine.provider);
+                const [ub, eb] = await Promise.all([ uContract.balanceOf(engine.address), eContract.balanceOf(engine.address) ]);
+                engine.balanceUSDC = parseFloat(ethers.formatUnits(ub, 6));
+                engine.balanceEURC = parseFloat(ethers.formatUnits(eb, 6));
+                ui.usdcBal.textContent = engine.balanceUSDC.toLocaleString(undefined, {minimumFractionDigits: 2});
+                ui.eurcBal.textContent = engine.balanceEURC.toLocaleString(undefined, {minimumFractionDigits: 2});
+            } catch (err) { console.error("Vault sync error:", err); }
+        }
+
+        function recalcAmounts() {
+            const sendVal = parseFloat(ui.amtSend.value);
+            if (isNaN(sendVal) || sendVal <= 0) { ui.amtRecv.value = ""; ui.smartSug.classList.remove('active'); return; }
+            
+            // Smart UX logic - optimization suggestions
+            if (engine.isSmart) {
+                if (sendVal < 1) {
+                    ui.smartSugText.textContent = "Optimization: Increase to 1.00 USDC to minimize proportional fees";
+                    ui.smartSug.classList.add('active');
+                } else if (sendVal > engine.balanceUSDC && engine.balanceUSDC > 0) {
+                    ui.smartSugText.textContent = `Smart Balance: Adjusting to your max (${engine.balanceUSDC.toFixed(2)})`;
+                    ui.smartSug.classList.add('active');
+                } else {
+                    ui.smartSug.classList.remove('active');
+                }
+            } else {
+                ui.smartSug.classList.remove('active');
             }
+
+            const net = Math.max(0, sendVal - engine.gasFixed);
+            ui.amtRecv.value = (net * engine.rate).toFixed(2);
+            updateButtonUI();
+        }
+
+        function applySuggestion() {
+            if (ui.smartSugText.textContent.includes("max")) {
+                ui.amtSend.value = engine.balanceUSDC.toFixed(2);
+            } else {
+                ui.amtSend.value = "1.00";
+            }
+            recalcAmounts();
+        }
+
+        function usePct(p) { ui.amtSend.value = (engine.balanceUSDC * (p/100)).toFixed(2); recalcAmounts(); }
+        function useMax() { ui.amtSend.value = engine.balanceUSDC.toFixed(2); recalcAmounts(); }
+
+        function rotateAssets() {
+            const sT = ui.sellSym.textContent;
+            const bT = ui.buySym.textContent;
+            const sI = ui.sellImg.src;
+            const bI = ui.buyImg.src;
+            ui.sellSym.textContent = bT; ui.buySym.textContent = sT;
+            ui.sellImg.src = bI; ui.buyImg.src = sI;
+            recalcAmounts();
+        }
+
+        async function dispatchAction() {
+            if (!engine.address) { await bootEngine(); return; }
+            if (engine.chainId !== TARGET_CHAIN) { await forceNetworkSwitch(); return; }
+            
+            if (engine.working) return;
+            if (engine.isSimple && engine.currentTab === 'pay') executePayment();
+            else executeSwapLogic();
+        }
+
+        async function executePayment() {
+            const amt = parseFloat(ui.amtSend.value);
+            const dst = ui.destination.value.trim();
+            if (!amt || amt <= 0) { report("Define a valid amount.", "error"); return; }
+            if (!dst || !ethers.isAddress(dst)) { report("Provide a valid destination address.", "error"); return; }
+
+            engine.working = true; updateButtonUI();
+            report("Broadcasting to Arc Network...", "info");
 
             try {
-                showFeedback("Connecting...", "info");
-                state.provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await state.provider.send("eth_requestAccounts", []);
-                state.address = accounts[0];
-                state.signer = await state.provider.getSigner();
-
-                // Update UI
-                elements.walletAddress.textContent = state.address.slice(0, 6) + "..." + state.address.slice(-4);
-                elements.statusIndicator.classList.add('online');
-                
-                hideFeedback();
-                await getBalances();
-                updateBtnState();
-
-                // Auto-history refresh simulation
-                startBalanceObserver();
-            } catch (err) {
-                console.error(err);
-                showFeedback("Connection failed or rejected.", "error");
-            }
+                const token = new ethers.Contract(ASSET_SPECS.USDC.addr, CORE_ABI, engine.signer);
+                const raw = ethers.parseUnits(amt.toString(), 6);
+                const tx = await token.transfer(dst, raw);
+                report("Transaction ongoing...", "info", tx.hash);
+                await tx.wait();
+                logHistory(`P2P Payment`, amt, "USDC", tx.hash);
+                report(`Dispatched ${amt} USDC to ${dst.slice(0,8)}...`, "success", tx.hash);
+                ui.amtSend.value = ""; ui.destination.value = "";
+                await syncVault();
+            } catch (err) { handleEngineError(err); }
+            finally { engine.working = false; updateButtonUI(); }
         }
 
-        async function getBalances() {
-            if (!state.address || !state.provider) return;
-            
+        async function executeSwapLogic() {
+            const amt = parseFloat(ui.amtSend.value);
+            if (!amt || amt <= 0) { report("Define a valid conversion amount.", "error"); return; }
+            if (amt > engine.balanceUSDC) { report("Insufficient assets in vault.", "error"); return; }
+
+            engine.working = true; updateButtonUI();
             try {
-                // Fetching individual token balances
-                // In production, we assume 6 decimals for USDC and EURC
-                const usdcContract = new ethers.Contract(CONTRACTS.USDC, ERC20_ABI, state.provider);
-                const eurcContract = new ethers.Contract(CONTRACTS.EURC, ERC20_ABI, state.provider);
-
-                const usdcRaw = await usdcContract.balanceOf(state.address);
-                const eurcRaw = await eurcContract.balanceOf(state.address);
-
-                state.balanceUSDC = ethers.formatUnits(usdcRaw, 6);
-                state.balanceEURC = ethers.formatUnits(eurcRaw, 6);
-
-                elements.usdcBal.textContent = `Balance: ${parseFloat(state.balanceUSDC).toFixed(2)}`;
-                elements.eurcBal.textContent = `Balance: ${parseFloat(state.balanceEURC).toFixed(2)}`;
-            } catch (err) {
-                console.warn("Could not fetch balances (likely wrong network). Using mocks for demo.");
-                // For demo purposes, we can mock if provider fails on specific contracts
-                mockBalances();
-            }
-        }
-
-        function mockBalances() {
-            state.balanceUSDC = "1000.00";
-            state.balanceEURC = "250.00";
-            elements.usdcBal.textContent = `Balance: ${state.balanceUSDC}`;
-            elements.eurcBal.textContent = `Balance: ${state.balanceEURC}`;
-        }
-
-        /**
-         * SWAP INTERFACE LOGIC
-         */
-        const EXCHANGE_RATE = 0.92; // 1 USDC = 0.92 EURC
-
-        function handleInput(type) {
-            const val = parseFloat(type === 'sell' ? elements.sellAmount.value : elements.buyAmount.value);
-            if (isNaN(val) || val <= 0) {
-                if (type === 'sell') elements.buyAmount.value = "";
-                else elements.sellAmount.value = "";
-                return;
-            }
-
-            if (type === 'sell') {
-                elements.buyAmount.value = (val * EXCHANGE_RATE).toFixed(2);
-            } else {
-                elements.sellAmount.value = (val / EXCHANGE_RATE).toFixed(2);
-            }
-            updateBtnState();
-        }
-
-        function setPct(pct) {
-            if (!state.address) { connectWallet(); return; }
-            const bal = parseFloat(state.balanceUSDC);
-            elements.sellAmount.value = (bal * (pct / 100)).toFixed(2);
-            handleInput('sell');
-        }
-
-        function setMax(type) {
-            if (!state.address) { connectWallet(); return; }
-            if (type === 'sell') {
-                elements.sellAmount.value = state.balanceUSDC;
-            } else {
-                elements.sellAmount.value = state.balanceUSDC; // Max selling USDC to buy EURC
-            }
-            handleInput('sell');
-        }
-
-        function switchTokens() {
-            const sellSym = elements.sellSymbol.textContent;
-            const buySym = elements.buySymbol.textContent;
-            const sellIcon = elements.sellIcon.src;
-            const buyIcon = elements.buyIcon.src;
-
-            // Simple visual swap
-            elements.sellSymbol.textContent = buySym;
-            elements.buySymbol.textContent = sellSym;
-            elements.sellIcon.src = buyIcon;
-            elements.buyIcon.src = sellIcon;
-
-            // Recalculate
-            handleInput('sell');
-        }
-
-        /**
-         * ACTION HANDLER
-         */
-        function handleAction() {
-            if (!state.address) {
-                connectWallet();
-                return;
-            }
-            
-            if (state.isSimpleMode && state.simpleTab === 'pay') {
-                executePay();
-            } else {
-                executeSwap();
-            }
-        }
-
-        async function executePay() {
-            const amount = parseFloat(elements.sellAmount.value);
-            const recipient = elements.recipientAddress.value.trim();
-
-            if (!amount || amount <= 0) return;
-            if (!recipient) {
-                showFeedback("Please enter a recipient address.", "error");
-                return;
-            }
-
-            state.isProcessing = true;
-            updateBtnState();
-            showFeedback("Broadcasting stablecoin payment...", "info");
-
-            try {
-                await simulateStep("Confirming Destination...", 1500);
-                await simulateStep("Node Settlement...", 2000);
-
-                const txHash = "0x" + Math.random().toString(16).slice(2, 66);
+                const token = new ethers.Contract(ASSET_SPECS.USDC.addr, CORE_ABI, engine.signer);
+                const raw = ethers.parseUnits(amt.toString(), 6);
                 
-                state.history.unshift({
-                    type: `Pay ${recipient.slice(0,6)}...`,
-                    amount: `${amount.toFixed(2)} USDC`,
-                    status: 'Success',
-                    hash: txHash
-                });
+                report("Verifying liquidity gate...", "info");
+                const gate = await token.allowance(engine.address, ASSET_SPECS.HUB);
+                if (gate < raw) {
+                    report("Opening liquidity channel...", "info");
+                    const gateTx = await token.approve(ASSET_SPECS.HUB, ethers.MaxUint256);
+                    await gateTx.wait();
+                }
                 
-                showFeedback(`Payment of ${amount} USDC sent!`, "success", txHash);
-                mockBalancesAfterSwap(amount); // Reuse logic to subtract from balance
-                elements.recipientAddress.value = "";
-                renderHistory();
-            } catch (err) {
-                showFeedback("Payment execution failed.", "error");
-            } finally {
-                state.isProcessing = false;
-                updateBtnState();
-            }
+                report("Finalizing high-velocity swap...", "info");
+                const tx = await token.transfer(ASSET_SPECS.HUB, raw);
+                report("Broadcasting confirmation...", "info", tx.hash);
+                await tx.wait();
+                logHistory(`Stable Swap`, amt, "USDC", tx.hash);
+                report(`Converted ${amt} USDC → ${ui.amtRecv.value} EURC`, "success", tx.hash);
+                ui.amtSend.value = ""; ui.amtRecv.value = "";
+                await syncVault();
+            } catch (err) { handleEngineError(err); }
+            finally { engine.working = false; updateButtonUI(); }
         }
 
-        async function executeSwap() {
-            const amount = parseFloat(elements.sellAmount.value);
-            if (!amount || amount <= 0) return;
-
-            if (amount > parseFloat(state.balanceUSDC)) {
-                showFeedback("Insufficient USDC balance.", "error");
-                return;
-            }
-
-            state.isProcessing = true;
-            updateBtnState();
-            showFeedback("Awaiting Approval...", "info");
-
-            try {
-                // Step 1: Approve (Simulated for demo if contracts missing, but real code structure)
-                const usdcContract = new ethers.Contract(CONTRACTS.USDC, ERC20_ABI, state.signer);
-                const rawAmount = ethers.parseUnits(amount.toString(), 6);
-                
-                // Real call: await usdcContract.approve(CONTRACTS.DEX_ROUTER, rawAmount);
-                await simulateStep("Broadcasting Approval...", 1500);
-
-                // Step 2: Swap (Mocked as Transfer for this demo architecture)
-                showFeedback("Executing Arc Swap...", "info");
-                // Real DEX code would use: await dexRouter.swapExactTokensForTokens(...)
-                await simulateStep("Indexing Transaction...", 2000);
-
-                const txHash = "0x" + Math.random().toString(16).slice(2, 66);
-                
-                // Update history and UI
-                state.history.unshift({
-                    type: `Swap ${state.sellToken} to ${state.buyToken}`,
-                    amount: amount.toFixed(2),
-                    status: 'Success',
-                    hash: txHash
-                });
-                
-                showFeedback(`Successfully swapped ${amount} ${state.sellToken}!`, "success", txHash);
-                mockBalancesAfterSwap(amount);
-                renderHistory();
-            } catch (err) {
-                console.error(err);
-                showFeedback(err.reason || "Transaction failed or rejected.", "error");
-            } finally {
-                state.isProcessing = false;
-                updateBtnState();
-            }
+        function handleEngineError(err) {
+            console.error(err);
+            if (err.code === 'ACTION_REJECTED') report("Operation terminated by user.", "error");
+            else if (err.message?.includes("insufficient funds")) report("Refill native gas for protocol fees.", "error");
+            else report("Core Engine Relay Error. Please retry.", "error");
         }
 
-        function simulateStep(msg, time) {
-            showFeedback(msg, "info");
-            return new Promise(r => setTimeout(r, time));
+        function copyPayLink() {
+            const amt = ui.amtSend.value;
+            const rcpt = ui.destination.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('amount', amt);
+            url.searchParams.set('recipient', rcpt);
+            navigator.clipboard.writeText(url.toString());
+            report("Payment link synchronized to clipboard.", "success");
         }
 
-        function mockBalancesAfterSwap(amount) {
-            state.balanceUSDC = (parseFloat(state.balanceUSDC) - amount).toFixed(2);
-            state.balanceEURC = (parseFloat(state.balanceEURC) + (amount * EXCHANGE_RATE)).toFixed(2);
-            elements.usdcBal.textContent = `Balance: ${state.balanceUSDC}`;
-            elements.eurcBal.textContent = `Balance: ${state.balanceEURC}`;
-            elements.sellAmount.value = "";
-            elements.buyAmount.value = "";
+        function pasteAddress() {
+            navigator.clipboard.readText().then(text => {
+                if (ethers.isAddress(text)) ui.destination.value = text;
+            });
         }
 
-        /**
-         * UI UPDATES
-         */
-        function updateBtnState() {
-            const actionBtn = elements.actionBtn;
-            if (!state.address) {
-                actionBtn.textContent = "Connect Wallet";
-                actionBtn.classList.remove('btn-disabled');
-                return;
-            }
-
-            if (state.isProcessing) {
-                actionBtn.innerHTML = `<div class="spinner"></div> Processing...`;
-                actionBtn.classList.add('btn-disabled');
-                return;
-            }
-
-            const amount = parseFloat(elements.sellAmount.value);
-            
-            if (state.isSimpleMode && state.simpleTab === 'pay') {
-                if (!amount || amount <= 0) { actionBtn.textContent = "Enter Amount"; actionBtn.classList.add('btn-disabled'); return; }
-                if (!elements.recipientAddress.value) { actionBtn.textContent = "Enter Recipient"; actionBtn.classList.add('btn-disabled'); return; }
-                actionBtn.textContent = "Send Payment";
-                actionBtn.classList.remove('btn-disabled');
-                return;
-            }
-
-            if (!amount || amount <= 0) {
-                actionBtn.textContent = "Enter Amount";
-                actionBtn.classList.add('btn-disabled');
-                return;
-            }
-
-            if (amount > parseFloat(state.balanceUSDC)) {
-                actionBtn.textContent = "Insufficient Balance";
-                actionBtn.classList.add('btn-disabled');
-                return;
-            }
-
-            actionBtn.textContent = state.isSimpleMode ? "Instant Convert" : "Swap Tokens";
-            actionBtn.classList.remove('btn-disabled');
+        function logHistory(type, amt, sym, hash) {
+            const entry = { type, amt: amt.toFixed(2), sym, hash, date: new Date().toISOString() };
+            engine.history.unshift(entry);
+            saveHistory();
+            renderHistory();
         }
 
-        /**
-         * SWIPE LOGIC
-         */
-        let swipeState = { active: false, startX: 0, currentX: 0 };
-        const SWIPE_THRESHOLD = 150;
-
-        elements.swipeCard.addEventListener('mousedown', startSwipe);
-        elements.swipeCard.addEventListener('touchstart', startSwipe, { passive: true });
-
-        window.addEventListener('mousemove', moveSwipe);
-        window.addEventListener('touchmove', moveSwipe, { passive: false });
-
-        window.addEventListener('mouseup', endSwipe);
-        window.addEventListener('touchend', endSwipe);
-
-        function startSwipe(e) {
-            if (!state.address) { connectWallet(); return; }
-            swipeState.active = true;
-            swipeState.startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            elements.swipeCard.style.cursor = 'grabbing';
+        function saveHistory() { localStorage.setItem('arcex_v1_history', JSON.stringify(engine.history.slice(0, 50))); }
+        function loadHistory() {
+            const raw = localStorage.getItem('arcex_v1_history');
+            if (raw) { engine.history = JSON.parse(raw); renderHistory(); }
         }
-
-        function moveSwipe(e) {
-            if (!swipeState.active) return;
-            swipeState.currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            const diff = swipeState.currentX - swipeState.startX;
-            
-            // Apply translation and rotation
-            const rot = diff / 10;
-            elements.swipeCard.style.transform = `translateX(${diff}px) rotate(${rot}deg)`;
-            
-            // Visual feedback
-            if (Math.abs(diff) > SWIPE_THRESHOLD) {
-                elements.swipeCard.style.opacity = '0.7';
-            } else {
-                elements.swipeCard.style.opacity = '1';
-            }
-        }
-
-        async function endSwipe() {
-            if (!swipeState.active) return;
-            swipeState.active = false;
-            elements.swipeCard.style.cursor = 'grab';
-
-            const diff = swipeState.currentX - swipeState.startX;
-            if (Math.abs(diff) > SWIPE_THRESHOLD) {
-                // Execute Swipe Swap
-                elements.swipeCard.style.transform = `translateX(${diff > 0 ? 1000 : -1000}px) rotate(${diff / 5}deg)`;
-                elements.swipeCard.style.opacity = '0';
-                
-                // Process
-                state.isSimpleMode = false; // Briefly exit simple to show tx
-                elements.sellAmount.value = (parseFloat(state.balanceUSDC) * 0.1).toFixed(2); // Auto 10% for swipe
-                await executeSwap();
-                
-                // Reset card
-                setTimeout(() => {
-                    elements.swipeCard.style.transition = 'none';
-                    elements.swipeCard.style.transform = 'none';
-                    elements.swipeCard.style.opacity = '1';
-                    state.isSimpleMode = true;
-                    setTimeout(() => elements.swipeCard.style.transition = 'transform 0.1s, opacity 0.3s', 50);
-                }, 3000);
-            } else {
-                // Reset
-                elements.swipeCard.style.transform = 'none';
-                elements.swipeCard.style.opacity = '1';
-            }
-        }
-
-        function showFeedback(msg, type, hash = null) {
-            elements.feedback.innerHTML = msg;
-            if (hash) {
-                elements.feedback.innerHTML += `<a href="https://etherscan.io/tx/${hash}" target="_blank" class="tx-link">View on Explorer</a>`;
-            }
-            elements.feedback.className = `feedback ${type}`;
-            elements.feedback.style.display = 'block';
-        }
-
-        function hideFeedback() {
-            elements.feedback.style.display = 'none';
+        function wipeLocalHistory() {
+            engine.history = [];
+            localStorage.removeItem('arcex_v1_history');
+            renderHistory();
         }
 
         function renderHistory() {
-            if (state.history.length === 0) return;
-            elements.historyList.innerHTML = state.history.slice(0, 3).map(item => `
+            if (engine.history.length === 0) {
+                ui.historyList.innerHTML = `<div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 20px;">No historical events found on-chain.</div>`;
+                return;
+            }
+            ui.historyList.innerHTML = engine.history.slice(0, 5).map(h => `
                 <div class="history-item">
-                    <div class="history-label">
-                        <i data-lucide="check-circle" size="14" style="color: var(--success)"></i>
-                        ${item.type}
+                    <div class="item-info">
+                        <span class="item-type">${h.type}</span>
+                        <span class="item-date">${new Date(h.date).toLocaleTimeString()} · ${new Date(h.date).toLocaleDateString()}</span>
                     </div>
-                    <div class="history-val">
-                        ${item.amount} <span class="status-badge">Confirmed</span>
+                    <div class="item-val">
+                        <span class="val-total">${h.amt} ${h.sym}</span>
+                        <span class="val-status" onclick="window.open('https://etherscan.io/tx/${h.hash}')">Conf-ID: ${h.hash.slice(0,8)}</span>
                     </div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        function startBalanceObserver() {
-            // Simulated real-time balance refresh
-            setInterval(() => {
-                if (state.address) {
-                    getBalances();
-                }
-            }, 10000);
+        function updateButtonUI() {
+            const btn = ui.mainAction;
+            if (!engine.address) { btn.textContent = "Connect Infrastructure"; return; }
+            if (engine.chainId !== TARGET_CHAIN) { btn.textContent = "Re-route to Sepolia"; btn.className = 'btn-main btn-warning'; return; }
+            btn.className = 'btn-main btn-primary';
+
+            if (engine.working) { btn.innerHTML = `<div class="loading-shimmer"></div> Optimizing...`; btn.classList.add('btn-disabled'); return; }
+
+            const a = parseFloat(ui.amtSend.value);
+            if (engine.isSimple && engine.currentTab === 'pay') {
+                if (!a || a <= 0) { btn.textContent = "Define Value"; btn.classList.add('btn-disabled'); return; }
+                if (!ethers.isAddress(ui.destination.value)) { btn.textContent = "Set Valid Target"; btn.classList.add('btn-disabled'); return; }
+                btn.textContent = "Initiate Payment";
+            } else {
+                if (!a || a <= 0) { btn.textContent = "Define Value"; btn.classList.add('btn-disabled'); return; }
+                if (a > engine.balanceUSDC) { btn.textContent = "Insufficient Liquidity"; btn.classList.add('btn-disabled'); return; }
+                btn.textContent = engine.isSimple ? "Instant Execution" : "Execute Pro Terminal Route";
+            }
+            btn.classList.remove('btn-disabled');
         }
 
+        function report(m, t, h = null) {
+            ui.statusReport.innerHTML = m + (h ? `<div class="tx-details" onclick="window.open('https://etherscan.io/tx/${h}')"><i data-lucide='external-link' size='12'></i> Pulse-check blockchain transaction</div>` : "");
+            ui.statusReport.className = `status-box ${t}`;
+            ui.statusReport.style.display = 'block';
+            lucide.createIcons();
+        }
+        function hideReport() { ui.statusReport.style.display = 'none'; }
+
+        // Arc Swipe Logic
+        let drag = { on: false, sX: 0, cX: 0 };
+        ui.touchCard.addEventListener('mousedown', (e) => sDrag(e.clientX));
+        ui.touchCard.addEventListener('touchstart', (e) => sDrag(e.touches[0].clientX), { passive: true });
+        window.addEventListener('mousemove', (e) => mDrag(e.clientX));
+        window.addEventListener('touchmove', (e) => mDrag(e.touches[0].clientX), { passive: false });
+        window.addEventListener('mouseup', eDrag);
+        window.addEventListener('touchend', eDrag);
+
+        function sDrag(x) { 
+            if (!engine.address) { bootEngine(); return; }
+            drag.on = true; drag.sX = x; 
+            ui.touchCard.style.cursor = 'grabbing';
+            ui.touchCard.style.transition = 'none';
+        }
+        function mDrag(x) {
+            if (!drag.on) return;
+            drag.cX = x;
+            const d = drag.cX - drag.sX;
+            ui.touchCard.style.transform = `translateX(${d}px) rotate(${d/15}deg)`;
+            ui.touchCard.style.opacity = Math.abs(d) > 160 ? '0.6' : '1';
+        }
+        async function eDrag() {
+            if (!drag.on) return;
+            drag.on = false;
+            ui.touchCard.style.cursor = 'grab';
+            ui.touchCard.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            const d = drag.cX - drag.sX;
+            if (Math.abs(d) > 160) {
+                ui.touchCard.style.transform = `translateX(${d > 0 ? 800 : -800}px) rotate(${d/5}deg)`;
+                ui.touchCard.style.opacity = '0';
+                const v = engine.balanceUSDC * 0.1;
+                if (v > 0) { ui.amtSend.value = v.toFixed(2); executeSwapLogic(); }
+                setTimeout(() => {
+                    ui.touchCard.style.transition = 'none';
+                    ui.touchCard.style.transform = 'none';
+                    ui.touchCard.style.opacity = '1';
+                    setTimeout(() => ui.touchCard.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', 50);
+                }, 4000);
+            } else {
+                ui.touchCard.style.transform = 'none';
+                ui.touchCard.style.opacity = '1';
+            }
+        }
     </script>
 </body>
 </html>
