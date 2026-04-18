@@ -25,6 +25,81 @@
             --glow: rgba(94, 92, 230, 0.15);
         }
 
+        /* Wallet Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            width: 90%;
+            max-width: 380px;
+            padding: 32px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wallet-option:hover {
+            border-color: var(--primary);
+            background: rgba(94, 92, 230, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .wallet-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .wallet-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .connected-badge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(50, 215, 75, 0.1);
+            color: var(--success);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(50, 215, 75, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         @keyframes fadeInScale { 
             from { opacity: 0; transform: translateY(20px) scale(0.98); } 
             to { opacity: 1; transform: translateY(0) scale(1); } 
@@ -93,7 +168,28 @@
         .header {
             text-align: center;
             margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 0 15px var(--glow));
+            animation: fadeInScale 1s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .logo-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .logo-gradient-1 { stop-color: #ffffff; }
+        .logo-gradient-2 { stop-color: #a0aec0; }
+        .logo-gradient-3 { stop-color: #e2e8f0; }
 
         h1 {
             font-size: 1.5rem;
@@ -352,7 +448,32 @@
 
     <div class="container">
         <div class="card">
+            <div id="walletBadge" class="connected-badge">
+                <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div>
+                <span id="connectedAddr">0x...</span>
+            </div>
             <div class="header">
+                <!-- Premium SVG Logo Reconstruction: New Arc Style -->
+                <div class="brand-logo">
+                    <svg viewBox="0 0 100 100" class="logo-svg" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" class="logo-gradient-1" />
+                                <stop offset="100%" class="logo-gradient-2" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Stylized Bold 'A' mimicking the new design -->
+                        <path d="M50 15 
+                                 C25 15, 15 40, 15 85 
+                                 L32 85 
+                                 C32 50, 40 38, 50 38 
+                                 C60 38, 68 50, 68 85 
+                                 L85 85 
+                                 C85 40, 75 15, 50 15" 
+                              fill="url(#logoGrad)" />
+                        <path d="M42 65 L65 65 L60 75 L38 75 Z" fill="url(#logoGrad)" opacity="0.8" />
+                    </svg>
+                </div>
                 <h1>Send USDC</h1>
                 <div class="tabs" id="modeTabs">
                     <div class="tab active" id="payTab">Pay</div>
@@ -383,9 +504,9 @@
                     </div>
                 </div>
 
-                <button class="btn-main" id="payBtn" onclick="handlePay()">
-                    <i data-lucide="send" size="18"></i>
-                    Send USDC
+                <button class="btn-main" id="payBtn" onclick="handlePayAction()">
+                    <i data-lucide="wallet" size="18" id="payBtnIcon"></i>
+                    <span id="payBtnText">Connect Wallet</span>
                 </button>
             </div>
 
@@ -409,11 +530,11 @@
                     </div>
                 </div>
 
-                <div class="swipe-track" id="swipeTrack">
+                <div class="swipe-track" id="swipeTrack" onclick="handleSwipeClick()">
                     <div class="swipe-progress" id="swipeProgress"></div>
-                    <div class="swipe-text">Swipe to Convert</div>
+                    <div class="swipe-text" id="swipeText">Connect Wallet to Swipe</div>
                     <div class="swipe-handle" id="swipeHandle">
-                        <i data-lucide="chevron-right" color="white" size="24"></i>
+                        <i data-lucide="wallet" color="white" size="24" id="swipeHandleIcon"></i>
                     </div>
                 </div>
 
@@ -423,6 +544,27 @@
             </div>
 
             <div id="feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <div id="walletModal" class="modal-overlay">
+        <div class="modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-weight: 800;">Connect Wallet</h3>
+                <i data-lucide="x" style="cursor: pointer; opacity: 0.5;" onclick="closeWalletModal()"></i>
+            </div>
+            <div class="wallet-option" onclick="connectWallet('OKX')">
+                <img src="https://picsum.photos/seed/okx/64/64" alt="OKX" class="wallet-icon" referrerpolicy="no-referrer">
+                <div class="wallet-name">OKX Wallet</div>
+            </div>
+            <div class="wallet-option" onclick="connectWallet('Phantom')">
+                <img src="https://picsum.photos/seed/phantom/64/64" alt="Phantom" class="wallet-icon" referrerpolicy="no-referrer">
+                <div class="wallet-name">Phantom</div>
+            </div>
+            <div class="wallet-option" onclick="connectWallet('MetaMask')">
+                <img src="https://picsum.photos/seed/metamask/64/64" alt="MetaMask" class="wallet-icon" referrerpolicy="no-referrer">
+                <div class="wallet-name">MetaMask</div>
+            </div>
         </div>
     </div>
 
@@ -438,7 +580,12 @@
                 eurc: 500.00
             },
             isProcessing: false,
-            rate: 0.99
+            rate: 0.99,
+            wallet: {
+                connected: false,
+                address: null,
+                provider: null
+            }
         };
 
         // DOM Elements
@@ -454,13 +601,78 @@
             payAmount: document.getElementById('payAmount'),
             recipient: document.getElementById('recipient'),
             payBtn: document.getElementById('payBtn'),
+            payBtnText: document.getElementById('payBtnText'),
+            payBtnIcon: document.getElementById('payBtnIcon'),
             feedback: document.getElementById('feedback'),
             swipeAmount: document.getElementById('swipeAmount'),
             convertedVal: document.getElementById('convertedVal'),
             swipeHandle: document.getElementById('swipeHandle'),
+            swipeHandleIcon: document.getElementById('swipeHandleIcon'),
             swipeTrack: document.getElementById('swipeTrack'),
-            swipeProgress: document.getElementById('swipeProgress')
+            swipeProgress: document.getElementById('swipeProgress'),
+            swipeText: document.getElementById('swipeText'),
+            walletModal: document.getElementById('walletModal'),
+            walletBadge: document.getElementById('walletBadge'),
+            connectedAddr: document.getElementById('connectedAddr')
         };
+
+        /**
+         * WALLET LOGIC
+         */
+        function openWalletModal() {
+            elements.walletModal.style.display = 'flex';
+        }
+
+        function closeWalletModal() {
+            elements.walletModal.style.display = 'none';
+        }
+
+        async function connectWallet(provider) {
+            state.wallet.connected = true;
+            state.wallet.provider = provider;
+            // Simulated random address
+            state.wallet.address = '0x' + Array.from({length: 8}, () => Math.floor(Math.random() * 16).toString(16)).join('') + '...' + Array.from({length: 4}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+            
+            closeWalletModal();
+            updateUIForWallet();
+            showFeedback(`${provider} connected successfully!`, 'success');
+        }
+
+        function updateUIForWallet() {
+            if (state.wallet.connected) {
+                elements.walletBadge.style.display = 'flex';
+                elements.connectedAddr.textContent = state.wallet.address;
+                
+                // Update Pay Button
+                elements.payBtnText.textContent = "Send USDC";
+                elements.payBtnIcon.setAttribute('data-lucide', 'send');
+                
+                // Update Swipe Track
+                elements.swipeText.textContent = "Swipe to Convert";
+                elements.swipeHandleIcon.setAttribute('data-lucide', 'chevron-right');
+            } else {
+                elements.walletBadge.style.display = 'none';
+                elements.payBtnText.textContent = "Connect Wallet";
+                elements.payBtnIcon.setAttribute('data-lucide', 'wallet');
+                elements.swipeText.textContent = "Connect Wallet to Swipe";
+                elements.swipeHandleIcon.setAttribute('data-lucide', 'wallet');
+            }
+            lucide.createIcons();
+        }
+
+        function handlePayAction() {
+            if (!state.wallet.connected) {
+                openWalletModal();
+            } else {
+                handlePay();
+            }
+        }
+
+        function handleSwipeClick() {
+            if (!state.wallet.connected) {
+                openWalletModal();
+            }
+        }
 
         /**
          * MODE TOGGLE LOGIC
@@ -552,8 +764,14 @@
             limit: 0
         };
 
-        elements.swipeHandle.addEventListener('mousedown', startSwipe);
-        elements.swipeHandle.addEventListener('touchstart', (e) => startSwipe(e.touches[0]));
+        elements.swipeHandle.addEventListener('mousedown', (e) => {
+            if (!state.wallet.connected) return;
+            startSwipe(e);
+        });
+        elements.swipeHandle.addEventListener('touchstart', (e) => {
+            if (!state.wallet.connected) return;
+            startSwipe(e.touches[0]);
+        });
 
         window.addEventListener('mousemove', (e) => moveSwipe(e.clientX));
         window.addEventListener('touchmove', (e) => moveSwipe(e.touches[0].clientX));
@@ -620,7 +838,8 @@
                 elements.swipeHandle.innerHTML = `<i data-lucide="check" color="white" size="24"></i>`;
                 lucide.createIcons();
                 updateBalances();
-                showFeedback(`Swapped ${amt} USDC for ${recv.toFixed(2)} EURC!`, "success");
+                const hash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                showFeedback(`Swapped ${amt} USDC for ${recv.toFixed(2)} EURC!`, "success", hash);
                 
                 setTimeout(() => {
                     resetSwipe();
@@ -640,7 +859,7 @@
                     <a href="https://testnet.arcscan.app/tx/${hash}" 
                        target="_blank" 
                        style="display: block; margin-top: 8px; font-size: 0.75rem; color: inherit; text-decoration: underline; opacity: 0.8; cursor: pointer;">
-                       View on ArcScan: ${hash.substring(0, 10)}...${hash.substring(60)}
+                       View on ArcScan: ${hash.substring(0, 10)}...${hash.substring(58)}
                     </a>`;
             }
             elements.feedback.className = `feedback ${type}`;
