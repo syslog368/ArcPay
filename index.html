@@ -11,35 +11,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Design Tokens - Dark (Default) */
+            /* Design Tokens - Dark (Enhanced) */
             --bg: #030306;
-            --card-glass: rgba(13, 14, 22, 0.75);
-            --inner-glass: rgba(255, 255, 255, 0.02);
+            --card-glass: rgba(15, 16, 26, 0.85);
+            --inner-glass: rgba(255, 255, 255, 0.03);
             --primary: #5e5ce6;
             --secondary: #bf5af2;
             --cyan: #5ac8fa;
             --text: #ffffff;
             --text-muted: #9a9ab0;
-            --border: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.1);
             --success: #32d74b;
             --error: #ff453a;
             --font: 'Plus Jakarta Sans', sans-serif;
             --mono: 'JetBrains Mono', monospace;
-            --glow: rgba(94, 92, 230, 0.4);
+            --glow: rgba(94, 92, 230, 0.5);
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
-            --card-shine: linear-gradient(110deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0) 100%);
-            --header-h: 80px;
-            --radius-ui: 20px;
+            --card-shine: linear-gradient(110deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0) 100%);
+            --radius-ui: 24px;
         }
 
         [data-theme="light"] {
-            --bg: #f2f2f7;
-            --card-glass: rgba(255, 255, 255, 0.7);
-            --inner-glass: rgba(0, 0, 0, 0.02);
-            --text: #1d1d1f;
-            --text-muted: #86868b;
-            --border: rgba(0, 0, 0, 0.06);
-            --card-shine: linear-gradient(110deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 50%, rgba(0,0,0,0) 100%);
+            --bg: #f8f8fb;
+            --card-glass: rgba(255, 255, 255, 0.85);
+            --inner-glass: rgba(0, 0, 0, 0.04);
+            --text: #0a0a0b;
+            --text-muted: #6e6e73;
+            --border: rgba(0, 0, 0, 0.08);
+            --card-shine: linear-gradient(110deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.01) 50%, rgba(0,0,0,0) 100%);
+            --glow: rgba(94, 92, 230, 0.2);
         }
 
         * {
@@ -74,29 +74,36 @@
             z-index: -1;
             overflow: hidden;
             background: var(--bg);
-            filter: blur(80px) saturate(180%);
         }
 
         .blob {
             position: absolute;
-            width: 600px;
-            height: 600px;
+            width: 800px;
+            height: 800px;
             border-radius: 50%;
-            opacity: 0.25;
+            opacity: 0.3;
             mix-blend-mode: screen;
+            filter: blur(120px);
+            animation: drift 25s infinite alternate ease-in-out;
         }
 
-        .blob-1 { background: var(--primary); top: -10%; left: -10%; }
-        .blob-2 { background: var(--secondary); bottom: -15%; right: -10%; }
-        .blob-3 { background: var(--cyan); top: 30%; right: 15%; opacity: 0.15; }
+        .blob-1 { background: radial-gradient(circle, var(--primary), transparent 70%); top: -20%; left: -10%; }
+        .blob-2 { background: radial-gradient(circle, var(--secondary), transparent 70%); bottom: -20%; right: -10%; animation-delay: -12s; }
+        .blob-3 { background: radial-gradient(circle, var(--cyan), transparent 70%); top: 30%; right: 10%; opacity: 0.2; animation-delay: -5s; }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(10%, 15%) scale(1.1); }
+            100% { transform: translate(-5%, -10%) scale(0.9); }
+        }
 
         .grain {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 9999;
             pointer-events: none;
-            opacity: 0.04;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .container {
@@ -118,14 +125,20 @@
         }
 
         .hero h1 {
-            font-size: 2.4rem;
+            font-size: 2.6rem;
             font-weight: 800;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.055em;
             line-height: 1.05;
-            background: linear-gradient(to bottom, var(--text), var(--text-muted));
+            background: linear-gradient(135deg, var(--text) 30%, var(--cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
+            filter: drop-shadow(0 0 30px rgba(255,255,255,0.15));
+            animation: fadeIn 1s var(--ease);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .footer-message {
@@ -142,14 +155,21 @@
         /* Twin-Box Architecture */
         .header-box {
             background: var(--card-glass);
-            backdrop-filter: blur(40px) saturate(180%);
+            backdrop-filter: blur(40px) saturate(200%);
             border: 1px solid var(--border);
             border-radius: var(--radius-ui);
-            padding: 10px 16px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            transition: all 0.3s var(--ease);
+        }
+
+        .header-box:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.4);
         }
 
         .header-left, .header-right {
@@ -314,18 +334,19 @@
             backdrop-filter: blur(60px) saturate(200%);
             border: 1px solid var(--border);
             border-radius: var(--radius-ui);
-            padding: 24px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4), 
-                        inset 0 1px 1px rgba(255,255,255,0.05);
+            padding: 32px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 1px rgba(255,255,255,0.06);
             margin-bottom: 24px;
             position: relative;
             overflow: hidden;
-            transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+            transition: all 0.5s var(--ease);
         }
 
         .glass-card:hover {
-            box-shadow: 0 50px 120px rgba(0, 0, 0, 0.5), 
-                        0 0 20px rgba(94, 92, 230, 0.1);
+            transform: translateY(-4px) scale(1.005);
+            box-shadow: 0 60px 140px rgba(0, 0, 0, 0.6), 
+                        0 0 40px rgba(94, 92, 230, 0.15);
         }
 
         .glass-card::before {
@@ -390,21 +411,40 @@
             background: var(--inner-glass);
             border: 1px solid var(--border);
             border-radius: 28px;
-            padding: 20px 24px;
+            padding: 24px;
             transition: all 0.3s var(--ease);
             position: relative;
             overflow: hidden;
         }
 
-        .input-group:hover:not(:focus-within) {
-            border-color: rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.04);
+        .input-group::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: skewX(-20deg);
+            pointer-events: none;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        .input-group:hover::after {
+            opacity: 1;
+            animation: sweep 3s infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            50% { left: 150%; }
+            100% { left: 150%; }
         }
 
         .input-group:focus-within {
             border-color: var(--primary);
             background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 40px rgba(94, 92, 230, 0.2);
+            box-shadow: 0 0 40px rgba(94, 92, 230, 0.15);
+            transform: scale(1.02);
         }
 
         .input-group.error {
@@ -465,7 +505,26 @@
         .token-pill:hover {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05) translateY(-1px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .max-btn {
+            background: rgba(94, 92, 230, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(94, 92, 230, 0.2);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .max-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
         }
 
         .token-img { width: 28px; height: 28px; border-radius: 50%; object-fit: contain; }
@@ -499,23 +558,50 @@
         /* Action Button */
         .btn-gradient {
             width: 100%;
-            padding: 16px;
-            border-radius: 16px;
+            padding: 18px;
+            border-radius: 18px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             color: white;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 800;
-            margin-top: 16px;
+            margin-top: 24px;
             cursor: pointer;
-            transition: all 0.3s var(--ease);
-            box-shadow: 0 10px 30px rgba(94, 92, 230, 0.4);
+            transition: all 0.4s var(--ease);
+            box-shadow: 0 10px 40px rgba(94, 92, 230, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
             position: relative;
             overflow: hidden;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -110%; }
+            30% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        .btn-gradient:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.015);
+            box-shadow: 0 20px 60px rgba(94, 92, 230, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-gradient:active:not(:disabled) {
+            transform: translateY(1px) scale(0.98);
         }
 
         .btn-gradient::after {
@@ -552,25 +638,35 @@
         .smart-toggle:hover { background: rgba(255,255,255,0.05); }
         
         .toggle-switch {
-            width: 36px; height: 18px;
-            background: #2c2f48;
+            width: 44px; height: 24px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 100px;
             position: relative;
-            transition: background 0.3s;
+            cursor: pointer;
+            transition: all 0.4s var(--ease);
+            border: 1px solid var(--border);
         }
-        
+
         .toggle-switch::after {
             content: '';
             position: absolute;
-            left: 2px; top: 2px;
-            width: 14px; height: 14px;
+            width: 18px; height: 18px;
             background: white;
             border-radius: 50%;
-            transition: transform 0.3s var(--ease);
+            top: 2px; left: 2px;
+            transition: transform 0.4s var(--ease);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        
-        .toggle-switch.active { background: var(--success); }
-        .toggle-switch.active::after { transform: translateX(18px); }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, var(--primary), var(--cyan));
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(90, 200, 250, 0.4);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
 
         .smart-toggle.loading {
             opacity: 0.6;
@@ -589,10 +685,17 @@
         }
 
         .intelligence-dot {
-            width: 6px; height: 6px;
+            width: 8px; height: 8px;
             background: var(--cyan);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--cyan);
+            box-shadow: 0 0 12px var(--cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; filter: blur(0); }
+            50% { transform: scale(1.5); opacity: 0.5; filter: blur(2px); }
+            100% { transform: scale(1); opacity: 1; filter: blur(0); }
         }
 
         /* Price Preview */
@@ -730,7 +833,12 @@
         .error-text { color: var(--error); }
 
         .stagger-in {
-            opacity: 1;
+            animation: staggerIn 0.5s var(--ease) both;
+        }
+
+        @keyframes staggerIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .spinner {
@@ -738,25 +846,34 @@
             border: 2px solid rgba(255,255,255,0.2);
             border-top-color: white;
             border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Toast */
         .toast {
             position: fixed;
             top: 32px; left: 50%;
-            transform: translateX(-50%) translateY(0);
-            background: rgba(22, 25, 38, 0.9);
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(22, 25, 38, 0.95);
             backdrop-filter: blur(20px);
-            padding: 14px 24px;
+            padding: 14px 28px;
             border-radius: 100px;
             border: 1px solid var(--border);
             display: flex; align-items: center; gap: 12px;
             z-index: 5000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             max-width: 90vw;
-            display: none;
+            transition: all 0.6s var(--ease);
+            opacity: 0;
+            pointer-events: none;
         }
-        .toast.active { display: flex; }
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
 
     </style>
 </head>
@@ -832,9 +949,9 @@
                     <div class="input-group">
                         <div class="input-header">
                             <span>Pay</span>
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <span>Bal: <span id="fromBalance" class="balance-value">0.00</span></span>
-                                <span class="success-text" style="cursor: pointer;" onclick="setMaxSwap()">MAX</span>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span style="opacity: 0.6;">Bal: <span id="fromBalance" class="balance-value">0.00</span></span>
+                                <button class="max-btn" onclick="setMaxSwap()">MAX</button>
                             </div>
                         </div>
                         <div class="input-row">
@@ -896,8 +1013,10 @@
                     </div>
 
                     <div class="intelligence-label" id="swapIntelligence">
-                        <div class="intelligence-dot"></div>
-                        <span>Best route selected via Arc Relay</span>
+                        <div class="intelligence-dot" style="margin-right: 4px;"></div>
+                        <span style="letter-spacing: 0.02em; text-transform: uppercase; font-size: 0.65rem; font-weight: 800;">Arc Relay Optimized</span>
+                        <div style="width: 1px; height: 10px; background: var(--border); margin: 0 4px;"></div>
+                        <span style="opacity: 0.8;">Instant Finality</span>
                     </div>
                 </div>
 
@@ -912,9 +1031,9 @@
                     <div class="input-group">
                         <div class="input-header">
                             <span>Network Value</span>
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <span style="font-family: var(--mono); color: var(--text-muted); text-transform: none;">Bal: <span id="payUSDCBal" class="balance-value">0.00</span></span>
-                                <span class="success-text" style="cursor: pointer;" onclick="setMaxPay()">MAX</span>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span style="font-family: var(--mono); color: var(--text-muted); opacity: 0.6; text-transform: none;">Bal: <span id="payUSDCBal" class="balance-value">0.00</span></span>
+                                <button class="max-btn" onclick="setMaxPay()">MAX</button>
                             </div>
                         </div>
                         <div class="input-row">
@@ -927,7 +1046,10 @@
                     </div>
 
                     <div class="input-group">
-                        <div class="input-header">Recipient Address</div>
+                        <div class="input-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span>Recipient Address</span>
+                            <span class="max-btn" style="text-transform: none; padding: 2px 8px;" onclick="useLastAddress()">Use last address</span>
+                        </div>
                         <div class="input-row" style="padding: 4px 0;">
                             <input type="text" id="payRecipient" spellcheck="false" placeholder="0x... or ENS / Lens" style="font-size: 1rem; color: white; border:none; outline:none; background:transparent; width:100%; font-family:var(--mono);">
                         </div>
@@ -938,8 +1060,9 @@
                         <span class="price-highlight">0.01 USDC</span>
                     </div>
 
-                    <div style="padding: 0 12px; font-size: 0.75rem; color: var(--text-muted); opacity: 0.7; margin-top: -4px;">
-                        Gas paid in USDC (no extra token required)
+                    <div style="padding: 4px 12px; font-size: 0.75rem; color: var(--success); font-weight: 700; display: flex; align-items: center; gap: 6px; background: rgba(50, 215, 75, 0.05); border-radius: 8px; width: fit-content; margin-top: -4px;">
+                        <i data-lucide="info" size="12"></i>
+                        Gas paid in USDC (No extra tokens)
                     </div>
 
                     <div class="smart-toggle" onclick="toggleSmartMode()">
@@ -953,9 +1076,9 @@
                         <div id="smartToggle" class="toggle-switch"></div>
                     </div>
 
-                    <div class="intelligence-label" id="payIntelligence" style="margin-bottom: 8px;">
+                    <div class="intelligence-label" id="payIntelligence" style="margin-bottom: 12px; background: rgba(90, 200, 250, 0.05); padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(90, 200, 250, 0.1);">
                         <div class="intelligence-dot"></div>
-                        <span>Instant finality enabled</span>
+                        <span style="color: var(--cyan); letter-spacing: 0.02em; font-weight: 800; font-size: 0.7rem;">INSTANT FINALITY ENABLED</span>
                     </div>
 
                     <button class="btn-gradient" id="payBtn" onclick="executePay()">
@@ -1253,6 +1376,7 @@
                     type: 'Payment',
                     fromToken: 'USDC',
                     toToken: recipient.substring(0, 10) + '...',
+                    recipientAddr: recipient,
                     fromAmount: amount,
                     toAmount: amount,
                     time: Date.now()
@@ -1415,20 +1539,71 @@
         }
 
         function animateValue(obj, start, end, decimals, isInput = false) {
-            const current = end.toLocaleString(undefined, { 
-                minimumFractionDigits: decimals, 
-                maximumFractionDigits: decimals 
-            });
+            if (isNaN(start)) start = 0;
+            const duration = 1200;
+            const startTime = performance.now();
             
-            if (isInput) obj.value = current;
-            else obj.textContent = current;
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out cubic
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const current = (start + (end - start) * easedProgress).toLocaleString(undefined, { 
+                    minimumFractionDigits: decimals, 
+                    maximumFractionDigits: decimals 
+                });
+                
+                if (isInput) obj.value = current;
+                else obj.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
         }
 
-        function notify(msg, type) {
+        function notify(msg, type = 'success') {
             const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
+            const icon = document.getElementById('toastIcon');
+            const msgEl = document.getElementById('toastMsg');
+            
+            msgEl.textContent = msg;
+            
+            const icons = {
+                'success': 'check-circle',
+                'error': 'alert-circle',
+                'info': 'info'
+            };
+            
+            icon.innerHTML = `<i data-lucide="${icons[type] || 'bell'}" size="18"></i>`;
+            lucide.createIcons();
+            
             toast.className = `toast active ${type}`;
-            setTimeout(() => toast.classList.remove('active'), 3000);
+            
+            // Vibrancy effect
+            if (type === 'error') {
+                toast.style.borderLeft = '6px solid var(--error)';
+            } else if (type === 'success') {
+                toast.style.borderLeft = '6px solid var(--success)';
+            } else {
+                toast.style.borderLeft = '6px solid var(--primary)';
+            }
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3500);
+        }
+
+        function useLastAddress() {
+            const last = state.history.find(tx => tx.type === 'Payment');
+            if (last) {
+                el.payRecipient.value = last.recipientAddr || '';
+                notify('Retrieved from history', 'info');
+            } else {
+                notify('No previous identity found', 'error');
+            }
         }
 
         init();
